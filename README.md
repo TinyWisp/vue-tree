@@ -35,7 +35,7 @@ A highly customizable tree component for vue 3.
 
  npm
  ```
-   npm install vue-tree --save
+   npm install @tinywisp/vue-tree --save
  ```
 
  引入
@@ -47,12 +47,12 @@ A highly customizable tree component for vue 3.
  ```javascript
 <template>
   <div id="app">
-    <VueTree :tree="tree" ref="tree" class="tree" />
+    <vue-tree :tree="tree" ref="tree" class="tree" />
   </div>
 </template>
 
 <script>
-import VueTree from 'vue-tree'
+import VueTree from '@tinywisp/vue-tree'
 
 export default {
   name: 'App',
@@ -137,7 +137,7 @@ export default {
 
  npm
  ```
-   npm install vue-tree --save
+   npm install @tinywisp/vue-tree --save
  ```
 
  import the library
@@ -149,12 +149,12 @@ export default {
  ```javascript
 <template>
   <div id="app">
-    <VueTree :tree="tree" ref="tree" class="tree" />
+    <vue-tree :tree="tree" ref="tree" class="tree" />
   </div>
 </template>
 
 <script>
-import VueTree from 'vue-tree'
+import VueTree from '@tinywisp/vue-tree'
 
 export default {
   name: 'App',
