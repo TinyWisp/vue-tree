@@ -1,6 +1,6 @@
 
 // Import vue component
-import component from '@/VueSmartTree.vue';
+import component from '@/VueTree.vue';
 
 // Default export is installable instance of component.
 // IIFE injects install function into component, allowing component
@@ -11,7 +11,7 @@ export default /*#__PURE__*/(() => {
 
   // Attach install function executed by Vue.use()
   installable.install = (app) => {
-    app.component('VueSmartTree', installable);
+    app.component('VueTree', installable);
   };
   return installable;
 })();

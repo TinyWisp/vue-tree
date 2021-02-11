@@ -7,8 +7,10 @@ test/
 coverage/
 example/
 rollup.config.js
+build.lib.config.js
 vue.config.js
 babel.config.js
 codecov.sh
+vite.config.js
 .travis.yml
 *.map
