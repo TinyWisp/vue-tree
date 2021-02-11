@@ -1,6 +1,6 @@
 
 // Import vue component
-import component from '@/VueTree.vue';
+import component from './VueTree.vue';
 
 // Default export is installable instance of component.
 // IIFE injects install function into component, allowing component

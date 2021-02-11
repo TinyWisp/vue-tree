@@ -114,6 +114,7 @@ if (!argv.format || argv.format === 'es') {
 if (!argv.format || argv.format === 'cjs') {
   const umdConfig = {
     ...baseConfig,
+    input: 'src/entry.js',
     external,
     output: {
       compact: true,
@@ -139,6 +140,7 @@ if (!argv.format || argv.format === 'iife') {
   const unpkgConfig = {
     ...baseConfig,
     external,
+    input: 'src/entry.js',
     output: {
       compact: true,
       file: 'lib/vue-tree.min.js',
