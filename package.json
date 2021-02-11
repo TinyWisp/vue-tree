@@ -20,7 +20,7 @@
   },
   "scripts": {
     "dev": "vite",
-    "build:docs": "vite build",
+    "build:docs": "vite build --base=/vue-tree/",
     "build:lib": "cross-env NODE_ENV=production rollup --config build.lib.config.js"
   },
   "dependencies": {
