@@ -40,7 +40,7 @@ A highly customizable tree component for vue 3.
 
  引入
  ```
-   import VueTree from 'vue-tree'
+   import VueTree from '@tinywisp/vue-tree'
  ```
 
  示例
@@ -142,7 +142,7 @@ export default {
 
  import the library
  ```
-   import VueTree from 'vue-tree'
+   import VueTree from '@tinywisp/vue-tree'
  ```
 
  usage

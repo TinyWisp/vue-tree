@@ -5,6 +5,9 @@ import vue from '@vitejs/plugin-vue'
  * @type {import('vite').UserConfig}
  */
 export default {
+  base: '/vue-tree/',
+  ssr: false,
+
   plugins: [vue()],
 
   optimizeDeps: {
