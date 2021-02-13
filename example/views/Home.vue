@@ -91,14 +91,14 @@ export default {
               title_zh:      '显示一颗树',
               route:         '/example/getting-started/display-a-tree',
               sourceCodeUrl: 'https://github.com/TinyWisp/vue-tree/blob/master/example/views/GettingStartedDisplayATreeExample.vue',
-              codepenUrl:    'https://codepen.io/tinywisp/pen/MWKNvvb'
+              codepenUrl:    'https://codepen.io/tinywisp/pen/KKNaaxY'
             },
             {
               title_en:      'basic operations',
               title_zh:      '基本操作',
               route:         '/example/getting-started/basic-operations',
               sourceCodeUrl: 'https://github.com/TinyWisp/vue-tree/blob/master/example/views/GettingStartedBasicOperationsExample.vue',
-              codepenUrl:    'https://codepen.io/tinywisp/pen/oNbyRwj'
+              codepenUrl:    'https://codepen.io/tinywisp/pen/eYBggxm'
             },
             {
               title_en:      'setting props of nodes',
@@ -108,7 +108,7 @@ export default {
               note_zh:       'defaultAttrs，可用来设置结点的缺省属性。<br>当结点没有某个属性，而defaultAttrs中有时，则会使用defaultAttrs中的该属性。',
               route:         '/example/getting-started/set-props',
               sourceCodeUrl: 'https://github.com/TinyWisp/vue-tree/blob/master/example/views/GettingStartedSetPropsExample.vue',
-              codepenUrl:    'https://codepen.io/tinywisp/pen/ExPqvqp'
+              codepenUrl:    'https://codepen.io/tinywisp/pen/XWNppyb'
             }
           ]
         },
@@ -123,49 +123,49 @@ export default {
               title_zh:      '基础',
               route:         '/example/drag-and-drop/basic',
               sourceCodeUrl: 'https://github.com/TinyWisp/vue-tree/blob/master/example/views/DragAndDropBasicExample.vue',
-              codepenUrl:    'https://codepen.io/tinywisp/pen/VweNWyV'
+              codepenUrl:    'https://codepen.io/tinywisp/pen/YzpNNBr'
             },
             {
               title_en:      'advanced',
               title_zh:      '高级',
               route:         '/example/drag-and-drop/advanced',
               sourceCodeUrl: 'https://github.com/TinyWisp/vue-tree/blob/master/example/views/DragAndDropAdvancedExample.vue',
-              codepenUrl:    'https://codepen.io/tinywisp/pen/LYGBrgp'
+              codepenUrl:    'https://codepen.io/tinywisp/pen/MWbJJxg'
             },
             {
               title_en:      'disabling drag and drop',
               title_zh:      '禁止拖放操作',
               route:         '/example/drag-and-drop/disable',
               sourceCodeUrl: 'https://github.com/TinyWisp/vue-tree/blob/master/example/views/DragAndDropDisableExample.vue',
-              codepenUrl:    'https://codepen.io/tinywisp/pen/zYrMoxE'
+              codepenUrl:    'https://codepen.io/tinywisp/pen/vYyggPW'
             },
             {
               title_en:      'custom appearance',
               title_zh:      '自定义外观',
               route:         '/example/drag-and-drop/custom-appearance',
               sourceCodeUrl: 'https://github.com/TinyWisp/vue-tree/blob/master/example/views/DragAndDropCustomAppearanceExample.vue',
-              codepenUrl:    'https://codepen.io/tinywisp/pen/dyGqXON'
+              codepenUrl:    'https://codepen.io/tinywisp/pen/yLVggwm'
             },
             {
               title_en:      'dragging a node out',
               title_zh:      '将结点拖动到树的外部',
               route:         '/example/drag-and-drop/drag-a-node-out',
               sourceCodeUrl: 'https://github.com/TinyWisp/vue-tree/blob/master/example/views/DragAndDropDragANodeOutExample.vue',
-              codepenUrl:    'https://codepen.io/tinywisp/pen/wvzGXwM'
+              codepenUrl:    'https://codepen.io/tinywisp/pen/LYbxxvy'
             },
             {
               title_en:      'dropping an external element',
               title_zh:      '将外部元素拖放到树上',
               route:         '/example/drag-and-drop/drop-an-external-element',
               sourceCodeUrl: 'https://github.com/TinyWisp/vue-tree/blob/master/example/views/DragAndDropDropAnExternalElementExample.vue',
-              codepenUrl:    'https://codepen.io/tinywisp/pen/VwKadaO'
+              codepenUrl:    'https://codepen.io/tinywisp/pen/JjbEEQE'
             },
             {
               title_en:      'multiple trees',
               title_zh:      '多棵树',
               route:         '/example/drag-and-drop/multiple-trees',
               sourceCodeUrl: 'https://github.com/TinyWisp/vue-tree/blob/master/example/views/DragAndDropMultipleTreesExample.vue',
-              codepenUrl:    'https://codepen.io/tinywisp/pen/NWRNzpp'
+              codepenUrl:    'https://codepen.io/tinywisp/pen/eYBggqp'
             },
 
           ]
@@ -181,21 +181,21 @@ export default {
               title_zh:      '父子结点联动',
               route:         '/example/checkbox/with-linkage',
               sourceCodeUrl: 'https://github.com/TinyWisp/vue-tree/blob/master/example/views/CheckboxWithLinkageExample.vue',
-              codepenUrl:    'https://codepen.io/tinywisp/pen/NWxBMob'
+              codepenUrl:    'https://codepen.io/tinywisp/pen/MWbJpWY'
             },
             {
               title_en:      'no parent-child linkage',
               title_zh:      '父子结点无联动',
               route:         '/example/checkbox/without-linkage',
               sourceCodeUrl: 'https://github.com/TinyWisp/vue-tree/blob/master/example/views/CheckboxWithoutLinkageExample.vue',
-              codepenUrl:    'https://codepen.io/tinywisp/pen/BajGavr'
+              codepenUrl:    'https://codepen.io/tinywisp/pen/VwmPpwr'
             },
             {
               title_en:      'custom appearance',
               title_zh:      '自定义外观',
               route:         '/example/checkbox/custom-appearance',
               sourceCodeUrl: 'https://github.com/TinyWisp/vue-tree/blob/master/example/views/CheckboxCustomAppearanceExample.vue',
-              codepenUrl:    'https://codepen.io/tinywisp/pen/vYLzKmJ'
+              codepenUrl:    'https://codepen.io/tinywisp/pen/WNoRpNW'
             }
           ]
         },
@@ -206,56 +206,56 @@ export default {
           title_zh:      '单选框',
           route:         '/example/radio-button',
           sourceCodeUrl: 'https://github.com/TinyWisp/vue-tree/blob/master/example/views/RadioButtonExample.vue',
-          codepenUrl:    'https://codepen.io/tinywisp/pen/gOPjKPM'
+          codepenUrl:    'https://codepen.io/tinywisp/pen/GRNrWgB'
         },
         {
           title_en:      'async loading',
           title_zh:      '异步加载',
           route:         '/example/async',
           sourceCodeUrl: 'https://github.com/TinyWisp/vue-tree/blob/master/example/views/AsyncExample.vue',
-          codepenUrl:    'https://codepen.io/tinywisp/pen/RwrBBRj'
+          codepenUrl:    'https://codepen.io/tinywisp/pen/RwoKpPy'
         },
         {
           title_en:      'editing',
           title_zh:      '编辑',
           route:         '/example/edit',
           sourceCodeUrl: 'https://github.com/TinyWisp/vue-tree/blob/master/example/views/EditExample.vue',
-          codepenUrl:    'https://codepen.io/tinywisp/pen/jOWpKdv'
+          codepenUrl:    'https://codepen.io/tinywisp/pen/ZEBLebb'
         },
         {
           title_en:      'buttons',
           title_zh:      '按钮',
           route:         '/example/button',
           sourceCodeUrl: 'https://github.com/TinyWisp/vue-tree/blob/master/example/views/ButtonExample.vue',
-          codepenUrl:    'https://codepen.io/tinywisp/pen/oNbMywg'
+          codepenUrl:    'https://codepen.io/tinywisp/pen/bGBgqVZ'
         },
         {
           title_en:      'context menu',
           title_zh:      '右键菜单',
           route:         '/example/contextmenu',
           sourceCodeUrl: 'https://github.com/TinyWisp/vue-tree/blob/master/example/views/ContextMenuExample.vue',
-          codepenUrl:    'https://codepen.io/tinywisp/pen/gOPjKGg'
+          codepenUrl:    'https://codepen.io/tinywisp/pen/XWNpMXj'
         },
         {
           title_en:      'searching',
           title_zh:      '查找',
           route:         '/example/search',
           sourceCodeUrl: 'https://github.com/TinyWisp/vue-tree/blob/master/example/views/SearchExample.vue',
-          codepenUrl:    'https://codepen.io/tinywisp/pen/bGEjjNj'
+          codepenUrl:    'https://codepen.io/tinywisp/pen/VwmPpaQ'
         },
         {
           title_en:      'multiple selecting',
           title_zh:      '多选',
           route:         '/example/multi-select',
           sourceCodeUrl: 'https://github.com/TinyWisp/vue-tree/blob/master/example/views/MultiSelectExample.vue',
-          codepenUrl:    'https://codepen.io/tinywisp/pen/qBbyKwb'
+          codepenUrl:    'https://codepen.io/tinywisp/pen/zYoNZKN'
         },
         {
           title_en:      'sorting',
           title_zh:      '排序',
           route:         '/example/sort',
           sourceCodeUrl: 'https://github.com/TinyWisp/vue-tree/blob/master/example/views/SortExample.vue',
-          codepenUrl:    'https://codepen.io/tinywisp/pen/NWxBBGO'
+          codepenUrl:    'https://codepen.io/tinywisp/pen/abBpJmW'
         },
 
         {
@@ -268,28 +268,28 @@ export default {
               title_zh:      '无根结点',
               route:         '/example/root-node/no-root-node',
               sourceCodeUrl: 'https://github.com/TinyWisp/vue-tree/blob/master/example/views/RootNodeNoRootNodeExample.vue',
-              codepenUrl:    'https://codepen.io/tinywisp/pen/qBbyKeZ'
+              codepenUrl:    'https://codepen.io/tinywisp/pen/oNYBZzp'
             },
             {
               title_en:      'no expander/collapser',
               title_zh:      '无展开/折叠按钮',
               route:         '/example/root-node/no-switcher',
               sourceCodeUrl: 'https://github.com/TinyWisp/vue-tree/blob/master/example/views/RootNodeNoSwitcherExample.vue',
-              codepenUrl:    'https://codepen.io/tinywisp/pen/gOPVRBj'
+              codepenUrl:    'https://codepen.io/tinywisp/pen/vYygxXr'
             },
             {
               title_en:      'checking if a node is the root node',
               title_zh:      '判断是否根结点',
               route:         '/example/root-node/checking',
               sourceCodeUrl: 'https://github.com/TinyWisp/vue-tree/blob/master/example/views/RootNodeCheckingExample.vue',
-              codepenUrl:    'https://codepen.io/tinywisp/pen/xxZvrQg'
+              codepenUrl:    'https://codepen.io/tinywisp/pen/gOLgmwQ'
             },
             {
               title_en:      'custom appearance',
               title_zh:      '自定义外观',
               route:         '/example/root-node/custom-appearance',
               sourceCodeUrl: 'https://github.com/TinyWisp/vue-tree/blob/master/example/views/RootNodeCustomAppearanceExample.vue',
-              codepenUrl:    'https://codepen.io/tinywisp/pen/WNrVEOv'
+              codepenUrl:    'https://codepen.io/tinywisp/pen/bGBgqwy'
             }
           ]
         },
@@ -304,35 +304,35 @@ export default {
               title_zh:      '大小',
               route:         '/example/custom-appearance/size',
               sourceCodeUrl: 'https://github.com/TinyWisp/vue-tree/blob/master/example/views/CustomAppearanceSizeExample.vue',
-              codepenUrl:    'https://codepen.io/tinywisp/pen/GRoXZOj'
+              codepenUrl:    'https://codepen.io/tinywisp/pen/VwmPpzd'
             },
             {
               title_en:      'icons',
               title_zh:      '图标',
               route:         '/example/custom-appearance/icon',
               sourceCodeUrl: 'https://github.com/TinyWisp/vue-tree/blob/master/example/views/CustomAppearanceIconExample.vue',
-              codepenUrl:    'https://codepen.io/tinywisp/pen/eYJLZjb'
+              codepenUrl:    'https://codepen.io/tinywisp/pen/RwoKpZe'
             },
             {
               title_en:      'no icons',
               title_zh:      '无图标',
               route:         '/example/custom-appearance/no-icons',
               sourceCodeUrl: 'https://github.com/TinyWisp/vue-tree/blob/master/example/views/CustomAppearanceNoIconsExample.vue',
-              codepenUrl:    'https://codepen.io/tinywisp/pen/NWxmvRp'
+              codepenUrl:    'https://codepen.io/tinywisp/pen/PobWpKL'
             },
             {
               title_en:      'no directory toggles',
               title_zh:      '无目录展开/折叠按钮',
               route:         '/example/custom-appearance/no-directory-toggles',
               sourceCodeUrl: 'https://github.com/TinyWisp/vue-tree/blob/master/example/views/CustomAppearanceNoDirectoryTogglesExample.vue',
-              codepenUrl:    'https://codepen.io/tinywisp/pen/eYZOZLL'
+              codepenUrl:    'https://codepen.io/tinywisp/pen/bGBgqrX'
             },
             {
               title_en:      'background color',
               title_zh:      '背景色',
               route:         '/example/custom-appearance/background-color',
               sourceCodeUrl: 'https://github.com/TinyWisp/vue-tree/blob/master/example/views/CustomAppearanceBackgroundColorExample.vue',
-              codepenUrl:    'https://codepen.io/tinywisp/pen/RwrYRLj'
+              codepenUrl:    'https://codepen.io/tinywisp/pen/oNYBZpd'
             },
             {
               title_en:      'stripes',
@@ -340,28 +340,28 @@ export default {
               component:     'CustomAppearanceStripesExample',
               route:         '/example/custom-appearance/stripes',
               sourceCodeUrl: 'https://github.com/TinyWisp/vue-tree/blob/master/example/views/CustomAppearanceStripesExample.vue',
-              codepenUrl:    'https://codepen.io/tinywisp/pen/oNbPLpW'
+              codepenUrl:    'https://codepen.io/tinywisp/pen/rNWjyJy'
             },
             {
               title_en:      'disabling animations',
               title_zh:      '禁止动画效果',
               route:         '/example/custom-appearance/disable-animations',
               sourceCodeUrl: 'https://github.com/TinyWisp/vue-tree/blob/master/example/views/CustomAppearanceDisableAnimationsExample.vue',
-              codepenUrl:    'https://codepen.io/tinywisp/pen/ZEQMOxY'
+              codepenUrl:    'https://codepen.io/tinywisp/pen/LYbxWdd'
             },
             {
               title_en:      'extra content',
               title_zh:      '附加内容',
               route:         '/example/custom-appearance/extra-content',
               sourceCodeUrl: 'https://github.com/TinyWisp/vue-tree/blob/master/example/views/CustomAppearanceExtraContentExample.vue',
-              codepenUrl:    'https://codepen.io/tinywisp/pen/NWxLrMo'
+              codepenUrl:    'https://codepen.io/tinywisp/pen/KKNaWRV'
             },
             {
               title_en:      'limiting widths of titles',
               title_zh:      '限制标题宽度',
               route:         '/example/custom-appearance/limit-title-width',
               sourceCodeUrl: 'https://github.com/TinyWisp/vue-tree/blob/master/example/views/CustomAppearanceLimitTitleWidthExample.vue',
-              codepenUrl:    'https://codepen.io/tinywisp/pen/yLexJQL'
+              codepenUrl:    'https://codepen.io/tinywisp/pen/RwoKpyE'
             }
           ]
         }
