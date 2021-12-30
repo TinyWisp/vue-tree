@@ -4,6 +4,7 @@ import AsyncExample from '../views/AsyncExample.vue'
 import EditExample from '../views/EditExample.vue'
 import ButtonExample from '../views/ButtonExample.vue'
 import ContextMenuExample from '../views/ContextMenuExample.vue'
+import ContextMenuInAnOverflowHiddenContainerExample from '../views/ContextMenuInAnOverflowHiddenContainerExample.vue'
 import SearchExample from '../views/SearchExample.vue'
 import MultiSelectExample from '../views/MultiSelectExample.vue'
 import RadioButtonExample from '../views/RadioButtonExample.vue'
@@ -74,6 +75,11 @@ const routes = [
     path: '/:lang/example/contextmenu',
     name: 'contextmenu-example',
     component: ContextMenuExample
+  },
+  {
+    path: '/:lang/example/contextmenu-in-an-overflow-hidden-container',
+    name: 'contextmenu-in-an-overflow-hidden-container-example',
+    component: ContextMenuInAnOverflowHiddenContainerExample
   },
 
   {

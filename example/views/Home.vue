@@ -237,6 +237,13 @@ export default {
           codepenUrl:    'https://codepen.io/tinywisp/pen/XWNpMXj'
         },
         {
+          title_en:      'context menu in an overflow hidden container',
+          title_zh:      'overflow:hidden容器中的右键菜单',
+          route:         '/example/contextmenu-in-an-overflow-hidden-container',
+          sourceCodeUrl: 'https://github.com/TinyWisp/vue-tree/blob/master/example/views/ContextMenuInAnOverflowHiddenContainerExample.vue',
+          codepenUrl:    'https://codepen.io/tinywisp/pen/XWNpMXj'
+        },
+        {
           title_en:      'searching',
           title_zh:      '查找',
           route:         '/example/search',
@@ -442,7 +449,7 @@ export default {
     }
   },
   mounted() {
-    this.init()
+    setTimeout(this.init.bind(this), 0)
   }
 }
 </script>

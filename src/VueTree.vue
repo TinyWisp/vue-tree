@@ -429,9 +429,7 @@ export default {
 
       let dpos = 0;
 
-      for (let i=0; i<items.length; i++) {
-        let node = items[i]
-
+      items.forEach(function(node, i) {
         if (!node.hasOwnProperty('id')) {
           node.id = this.generateId()
         }
@@ -450,8 +448,8 @@ export default {
           fullIndent = this.getAttr(node, 'style', 'indent')
         } else if (path.length > 1) {
           let indents = []
-          for (let i=1; i<path.length; i++) {
-            let indent = this.getAttr(path[i], 'style', 'indent')
+          for (let j=1; j<path.length; j++) {
+            let indent = this.getAttr(path[j], 'style', 'indent')
             indents.push(indent)
           }
           let indent = this.getAttr(node, 'style', 'indent')
@@ -520,7 +518,7 @@ export default {
         if (isVisible) {
           dpos++
         }
-      }
+      }.bind(this))
 
       return items
     },
@@ -968,7 +966,33 @@ export default {
 
       if (this.fnLoadData === null) {
         this.setAttr(node, 'directoryState', 'expanded')
-        this.refresh()
+        for (let i=node.__.gpos + 1; i<this.items.length; i++) {
+          let tnode = this.items[i];
+          if (tnode.__.depth <= node.__.depth) {
+            break
+          }
+
+          let path = this.getAttr(tnode, '__', 'path')
+          let isVisible = true
+          for (let ntnode of path) {
+            if (this.getDirectoryState(ntnode) === 'collapsed') {
+              isVisible = false
+              break
+            }
+          }
+          this.setAttr(tnode, '__', 'isVisible', isVisible)
+        }
+        let dpos = node.__.dpos
+        for (let i=node.__.gpos + 1; i<this.items.length; i++) {
+          let tnode = this.items[i]
+          if (tnode.__.isVisible === true) {
+            dpos++
+            this.setAttr(tnode, '__', 'dpos', dpos)
+          } else {
+            this.setAttr(tnode, '__', 'dpos', -1)
+          }
+        }
+        //this.refresh()
         this.$emit('expand', node)
         return
       }
@@ -1018,7 +1042,24 @@ export default {
       }
 
       this.setAttr(node, 'directoryState', 'collapsed')
-      this.refresh()
+      //this.refresh()
+      for (let i=node.__.gpos + 1; i<this.items.length; i++) {
+        let tnode = this.items[i];
+        if (tnode.__.depth <= node.__.depth) {
+          break
+        }
+        this.setAttr(tnode, '__', 'isVisible', false)
+      }
+      let dpos = node.__.dpos
+      for (let i=node.__.gpos + 1; i<this.items.length; i++) {
+        let tnode = this.items[i]
+        if (tnode.__.isVisible === true) {
+          dpos++
+          this.setAttr(tnode, '__', 'dpos', dpos)
+        } else {
+          this.setAttr(tnode, '__', 'dpos', -1)
+        }
+      }
       this.$emit('collapse', node)
     },
     expandAncestors(node) {
