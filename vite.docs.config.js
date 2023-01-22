@@ -6,7 +6,7 @@ import vue from '@vitejs/plugin-vue'
  */
 export default {
   root: 'example',
-  base: '/',
+  base: './',
   ssr: false,
 
   plugins: [vue()],
