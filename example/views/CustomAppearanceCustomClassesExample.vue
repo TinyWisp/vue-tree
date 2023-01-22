@@ -1,13 +1,10 @@
 <template>
   <div class="example-wrapper">
     <div class="panel">
-      <vue-tree :tree="tree"  ref="tree"  class="tree" :enableDragNodeOut="true"/>
-      <div
-        class="container"
-        @dragover="dragOver"
-        @drop="dropNode">
-        {{containerTitle}}
-      </div>
+      <vue-tree 
+        :tree="tree"
+        :fnCustomClasses="fnCustomClasses" 
+        class="tree"/>
     </div>
   </div>
 </template>
@@ -16,13 +13,12 @@
 import VueTree from '../../src/VueTree.vue'
 
 export default {
-  name: 'drag-and-drop-drag-a-node-out-example',
+  name: 'custom-appearance-size-example',
   components: {
     VueTree
   },
   data() {
     return {
-      containerTitle: 'Drag a node here!',
       tree: [
         {
           id: 1,
@@ -59,14 +55,6 @@ export default {
             {
               id: 8,
               title: 'child 4'
-            },
-            {
-              id: 9,
-              title: 'child 5'
-            },
-            {
-              id: 10,
-              title: 'child 6'
             }
           ]
         }
@@ -74,47 +62,32 @@ export default {
     }
   },
   methods: {
-    dragOver (event) {
-      event.preventDefault()
-    },
-    dropNode () {
-      let from = this.$refs.tree.getDragFrom()
-      let node = this.$refs.tree.getById(from.nodeId)
-      this.containerTitle = node.title
-      this.$refs.tree.remove(node)
+    fnCustomClasses(node) {
+      return [`mystyle-${node.id}`]
     }
   }
 }
 </script>
 
 <style scoped>
-.panel {
-  position: relative;
-}
 .panel .tree {
   width: 50%;
 }
-.btn {
-  width: 100px;
-  margin-right: 20px;
+</style>
+
+<style>
+.mystyle-1 {
+  font-weight: bolder;
+  text-shadow: 1px 1px 1px grey;
 }
-.info {
-  display: block;
-  width: 100%;
-  text-align: left;
+
+.mystyle-3 .vue-tree-title {
+  color: white;
+  text-shadow: 0px 0px 3px darkblue, 0px 0px 6px darkblue, 0px 0px 9px darkblue;
 }
-.key {
-  font-weight: bold;
-  font-size: 18px;
-}
-.container {
-  padding: 0 2em;
-  line-height: 100px;
-  width: 150px;
-  height: 100px;
-  border: 2px dashed gray;
-  position: absolute;
-  left: 60%;
-  top: 100px;
+
+.mystyle-5 {
+  color: blue;
+  text-shadow: 1px 1px grey, 1px 1px grey, 1px 1px grey;
 }
 </style>

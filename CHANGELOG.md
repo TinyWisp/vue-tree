@@ -1,6 +1,23 @@
-1.0.0
-- the first stable version
+3.0.0
+- added:
+	- touch support for drag and drop.
+	- the isTheTouchOperationFromTheTree method.
+	- the getDragFrom method.
+	- the fnCustomClasses property.
+- fixed:
+	- the previously selected node will be deselected if the user clicks a node and then the fnBeforeSelect 
+	function returns false.
+  - the input box's width didn't fit its content well.
+  - the reload() method caused an animation playing.
+	- a node was able to be dragged while the user was editing its title.
+	- reverted the performance optimization that might lead to the fnAfterCalculate property not working in 2.0.0.
+	- when the dropped a node from another tree, two drop events were emitted.
+- security:
+	- upgraded some dependencies.
 
 2.0.0
 - changed:
-	- optimized the expand/collapse performance
+	- optimized the expand/collapse performance.
+
+1.0.0
+- the first stable version.

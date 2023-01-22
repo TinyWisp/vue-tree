@@ -8,7 +8,7 @@ import resolve from '@rollup/plugin-node-resolve';
 import replace from '@rollup/plugin-replace';
 import babel from '@rollup/plugin-babel';
 import PostCSS from 'rollup-plugin-postcss';
-import { terser } from 'rollup-plugin-terser';
+import terser from '@rollup/plugin-terser';
 import minimist from 'minimist';
 
 // Get browserslist config and remove ie from es build targets
@@ -112,14 +112,39 @@ if (!argv.format || argv.format === 'es') {
 }
 
 if (!argv.format || argv.format === 'cjs') {
+  const cjsConfig = {
+    ...baseConfig,
+    input: 'src/entry.js',
+    external,
+    output: {
+      compact: true,
+      file: 'lib/vue-tree.cjs.js',
+      format: 'cjs',
+      name: 'VueTree',
+      exports: 'auto',
+      globals,
+    },
+    plugins: [
+      replace(baseConfig.plugins.replace),
+      ...baseConfig.plugins.preVue,
+      vue(baseConfig.plugins.vue),
+      ...baseConfig.plugins.postVue,
+      babel(baseConfig.plugins.babel),
+      commonjs(),
+    ],
+  };
+  buildFormats.push(cjsConfig);
+}
+
+if (!argv.format || argv.format === 'umd') {
   const umdConfig = {
     ...baseConfig,
     input: 'src/entry.js',
     external,
     output: {
       compact: true,
-      file: 'lib/vue-tree.ssr.js',
-      format: 'cjs',
+      file: 'lib/vue-tree.umd.js',
+      format: 'umd',
       name: 'VueTree',
       exports: 'auto',
       globals,

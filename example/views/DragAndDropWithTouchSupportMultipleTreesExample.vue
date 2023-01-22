@@ -8,7 +8,8 @@
         :tree="leftTree"
         :enableDragNodeOut="true"
         :enableDropExternalElement="true"
-        @drop="(dragAndDrop, event) => {drop('leftTree', dragAndDrop)}"/>
+        :enableTouchSupport="true"
+        @drop="(dragAndDrop) => drop('leftTree', dragAndDrop)"/>
       <vue-tree
         ref="rightTree" 
         class="tree right"
@@ -16,7 +17,8 @@
         :tree="rightTree"
         :enableDragNodeOut="true"
         :enableDropExternalElement="true"
-        @drop="(dragAndDrop, event) => {drop('rightTree', dragAndDrop)}"/>
+        :enableTouchSupport="true"
+        @drop="(dragAndDrop) => drop('rightTree', dragAndDrop)"/>
     </div>
   </div>
 </template>
@@ -25,7 +27,7 @@
 import VueTree from '../../src/VueTree.vue'
 
 export default {
-  name: 'drag-and-drop-drop-an-external-element-example',
+  name: 'drag-and-drop-multiple-trees-with-touch-support-example',
   components: {
     VueTree
   },
@@ -146,7 +148,7 @@ export default {
 
       let node  = {
         id: Date.now(),
-        title: dragAndDrop.from.treeId + ' ' + dragNode.title,
+        title: fromTree.treeId + ' ' + dragNode.title,
         hasChild: false
       }
 

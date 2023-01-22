@@ -1,14 +1,19 @@
 <template>
   <div class="example-wrapper">
     <div class="panel">
-      <vue-tree :tree="tree"  ref="tree"  class="tree" :enableDragNodeOut="true"/>
-      <div
-        class="container"
-        @dragover="dragOver"
-        @drop="dropNode">
-        {{containerTitle}}
-      </div>
+      <vue-tree
+        :tree="tree"
+        class="tree"
+        @dragover="showInfo"
+        @dragend="showInfo"
+        :enableTouchSupport="true" />
     </div>
+    <span class="info">
+      <span class="key">dragNode:</span> <span class="val">{{dragNode}}</span> <br>
+      <span class="key">overNode:</span> <span class="val">{{overNode}}</span> <br>
+      <span class="key">overArea:</span> <span class="val">{{overArea}}</span> <br>
+      <span class="key">status:</span> <span class="val">{{status}}</span>
+    </span>
   </div>
 </template>
 
@@ -16,13 +21,16 @@
 import VueTree from '../../src/VueTree.vue'
 
 export default {
-  name: 'drag-and-drop-drag-a-node-out-example',
+  name: 'drag-and-drop-basic-touch-support-example',
   components: {
     VueTree
   },
   data() {
     return {
-      containerTitle: 'Drag a node here!',
+      dragNode: '',
+      overNode: '',
+      overArea: '',
+      status: 0,
       tree: [
         {
           id: 1,
@@ -74,23 +82,22 @@ export default {
     }
   },
   methods: {
-    dragOver (event) {
-      event.preventDefault()
-    },
-    dropNode () {
-      let from = this.$refs.tree.getDragFrom()
-      let node = this.$refs.tree.getById(from.nodeId)
-      this.containerTitle = node.title
-      this.$refs.tree.remove(node)
+    showInfo(dragAndDrop) {
+      this.dragNode = dragAndDrop.dragNode !== null
+        ? dragAndDrop.dragNode.title
+        : ''
+      this.overNode = dragAndDrop.overNode !== null
+        ? dragAndDrop.overNode.title
+        : ''
+      this.overArea = dragAndDrop.overArea !== null
+        ? dragAndDrop.overArea
+        : ''
     }
   }
 }
 </script>
 
 <style scoped>
-.panel {
-  position: relative;
-}
 .panel .tree {
   width: 50%;
 }
@@ -106,15 +113,5 @@ export default {
 .key {
   font-weight: bold;
   font-size: 18px;
-}
-.container {
-  padding: 0 2em;
-  line-height: 100px;
-  width: 150px;
-  height: 100px;
-  border: 2px dashed gray;
-  position: absolute;
-  left: 60%;
-  top: 100px;
 }
 </style>

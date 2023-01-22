@@ -5,7 +5,8 @@ import vue from '@vitejs/plugin-vue'
  * @type {import('vite').UserConfig}
  */
 export default {
-  base: '/vue-tree/',
+  root: 'example',
+  base: '/',
   ssr: false,
 
   plugins: [vue()],
@@ -14,11 +15,13 @@ export default {
     include: ["axios"]
   },
 
+  publicDir: ['public'],
+
   resolve: {
-    extensions: ['.js', '.vue']
+    extensions: ['.js', '.vue', ".mjs"]
   },
 
   build: {
-    outDir: 'docs'
+    outDir: '../docs'
   }
 }

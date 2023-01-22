@@ -1,11 +1,16 @@
 <template>
   <div class="example-wrapper">
     <div class="panel">
-      <vue-tree :tree="tree"  ref="tree"  class="tree" :enableDragNodeOut="true"/>
+      <vue-tree
+        ref="tree"
+        class="tree"
+        :tree="tree"
+        :enableDragNodeOut="true"
+        :enableTouchSupport="true"/>
       <div
-        class="container"
-        @dragover="dragOver"
-        @drop="dropNode">
+        :class="['container', isHover ? 'container-hover' : '']"
+        ref="container"
+      >
         {{containerTitle}}
       </div>
     </div>
@@ -23,6 +28,7 @@ export default {
   data() {
     return {
       containerTitle: 'Drag a node here!',
+      isHover: false,
       tree: [
         {
           id: 1,
@@ -74,15 +80,34 @@ export default {
     }
   },
   methods: {
-    dragOver (event) {
-      event.preventDefault()
+    isInDropArea(touch) {
+      if (!this.$refs.container) {
+        return false
+      }
+
+      let container = this.$refs.container
+      let containerRect = container.getBoundingClientRect()
+      return (touch.clientX >= containerRect.left && touch.clientX <= containerRect.right && touch.clientY >= containerRect.top && touch.clientY <= containerRect.bottom) 
     },
-    dropNode () {
-      let from = this.$refs.tree.getDragFrom()
-      let node = this.$refs.tree.getById(from.nodeId)
-      this.containerTitle = node.title
-      this.$refs.tree.remove(node)
-    }
+    touchMoveHandler(event) {
+      this.isHover = (this.isInDropArea(event.touches.item(0)) && this.$refs.tree.isTheTouchOperationFromTheTree(event))
+    },
+    touchEndHandler (event) {
+      if (this.isInDropArea(event.changedTouches.item(0)) && this.$refs.tree.isTheTouchOperationFromTheTree(event)) {
+        const from = this.$refs.tree.getDragFrom()
+        const dragNode = this.$refs.tree.getById(from.nodeId)
+        this.containerTitle = dragNode.title
+        this.$refs.tree.remove(dragNode)
+      }
+    },
+  },
+  mounted() {
+    document.addEventListener('touchmove', this.touchMoveHandler.bind(this))
+    document.addEventListener('touchend', this.touchEndHandler.bind(this))
+  },
+  beforeDestroy() {
+    document.removeEventListener('touchmove', this.touchMoveHandler.bind(this))
+    document.removeEventListener('touchend', this.touchEndHandler.bind(this))
   }
 }
 </script>
@@ -116,5 +141,8 @@ export default {
   position: absolute;
   left: 60%;
   top: 100px;
+}
+.container-hover {
+  background-color: lightgray;
 }
 </style>

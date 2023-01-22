@@ -172,6 +172,49 @@ export default {
         },
 
         {
+          title_en:      'drag and drop with touch support',
+          title_zh:      '触屏设备上的拖拽操作',
+          hasChild:      true,
+          children:      [
+            {
+              title_en:      'basic',
+              title_zh:      '基础示例',
+              route:         '/example/drag-and-drop-with-touch-support/basic',
+              sourceCodeUrl: 'https://github.com/TinyWisp/twtree/blob/master/example/views/DragAndDropWithTouchSupportBasicExample.vue',
+              codepenUrl:    'https://codepen.io/tinywisp/pen/YzpNNBr'
+            },
+            {
+              title_en:      'advanced',
+              title_zh:      '高级',
+              route:         '/example/drag-and-drop-with-touch-support/advanced',
+              sourceCodeUrl: 'https://github.com/TinyWisp/twtree/blob/master/example/views/DragAndDropWithTouchSupportAdvancedExample.vue',
+              codepenUrl:    'https://codepen.io/tinywisp/pen/JjBpjyd'
+            },
+            {
+              title_en:      'dragging a node out',
+              title_zh:      '将结点拖动到树的外部',
+              route:         '/example/drag-and-drop-with-touch-support/drag-a-node-out',
+              sourceCodeUrl: 'https://github.com/TinyWisp/twtree/blob/master/example/views/DragAndDropWithTouchSupportDragANodeOutExample.vue',
+              codepenUrl:    'https://codepen.io/tinywisp/pen/rNrJNwg'
+            },
+            {
+              title_en:      'dropping an external element',
+              title_zh:      '将外部元素拖动到树上',
+              route:         '/example/drag-and-drop-with-touch-support/drop-an-external-element',
+              sourceCodeUrl: 'https://github.com/TinyWisp/twtree/blob/master/example/views/DragAndDropWithTouchSupportDropAnExternalElementExample.vue',
+              codepenUrl:    'https://codepen.io/tinywisp/pen/poZaowQ'
+            },
+            {
+              title_en:      'multiple trees',
+              title_zh:      '多棵树',
+              route:         '/example/drag-and-drop-with-touch-support/multiple-trees',
+              sourceCodeUrl: 'https://github.com/TinyWisp/twtree/blob/master/example/views/DragAndDropWithTouchSupportMultipleTreesExample.vue',
+              codepenUrl:    'https://codepen.io/tinywisp/pen/PoBQojJ'
+            },
+          ]
+        },
+
+        {
           title_en:      'checkbox',
           title_zh:      '复选框',
           hasChild:      true,
@@ -369,7 +412,16 @@ export default {
               route:         '/example/custom-appearance/limit-title-width',
               sourceCodeUrl: 'https://github.com/TinyWisp/vue-tree/blob/master/example/views/CustomAppearanceLimitTitleWidthExample.vue',
               codepenUrl:    'https://codepen.io/tinywisp/pen/RwoKpyE'
-            }
+            },
+             {
+              title_en:      'custom classes',
+              title_zh:      '自定义css样式',
+              note_en:       'use the fnCustomClasses property',
+              note_zh:       '使用fnCustomClasses属性实现更复杂的效果',
+              route:         '/example/custom-appearance/custom-classes',
+              sourceCodeUrl: 'https://github.com/TinyWisp/vue-tree/blob/master/example/views/CustomAppearanceCustomClassesExample.vue',
+              codepenUrl:    'https://codepen.io/tinywisp/pen/bGjLbJR'
+            },
           ]
         }
 

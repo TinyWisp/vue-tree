@@ -16,14 +16,15 @@
         <template v-for="item of items">
           <li
             v-if="item.__.isVisible"
-            :class="{
-              'vue-tree-node':                true, 
-              'vue-tree-node-selected':       item.selected,
-              'vue-tree-node-search-result':  item.__.isSearchResult,
-              'vue-tree-node-drag-over-prev': item.__.dragOverArea === 'prev' && item.__.isDroppable,
-              'vue-tree-node-drag-over-next': item.__.dragOverArea === 'next' && item.__.isDroppable,
-              'vue-tree-node-drag-over-self': item.__.dragOverArea === 'self' && item.__.isDroppable
-            }"
+            :class="[
+              'vue-tree-node',
+              {'vue-tree-node-selected':       item.selected},
+              {'vue-tree-node-search-result':  item.__.isSearchResult},
+              {'vue-tree-node-drag-over-prev': item.__.dragOverArea === 'prev' && item.__.isDroppable},
+              {'vue-tree-node-drag-over-next': item.__.dragOverArea === 'next' && item.__.isDroppable},
+              {'vue-tree-node-drag-over-self': item.__.dragOverArea === 'self' && item.__.isDroppable},
+              ...item.__.customClasses
+            ]"
             :style="{
               '--fullIndent':          item.__.fullIndent,
               '--height':              item.style.height,
@@ -44,7 +45,7 @@
               '--marginTop':           item.style.marginTop,
               '--marginBottom':        item.style.marginBottom
             }"
-            :draggable="true"
+            :draggable="!item.__.isEditing"
             @click = "clickEvent(item, $event)"
             @contextmenu = "contextMenuEvent(item, $event)"
             @dragstart="dragStartEvent(item, $event)"
@@ -52,6 +53,7 @@
             @dragend="dragEndEvent($event)"
             @drop="dropEvent($event)"
             @dragenter="dragEnterEvent($event)"
+            @touchstart="touchStartEvent(item, $event)"
             :ref="'node-' + item.id"
             :key="item.id">
             <span class="vue-tree-switcher-wrapper" v-if="item.style.showSwitcher" @click.stop="toggleDirectoryState(item)">
@@ -227,6 +229,10 @@ export default {
       type: Boolean,
       default: true
     },
+    enableTouchSupport: {
+      type: Boolean,
+      default: false
+    },
     fnLoadData: {
       type: Function,
       required: false,
@@ -281,6 +287,11 @@ export default {
       type: Function,
       required: false,
       default: null
+    },
+    fnCustomClasses: {
+      type: Function,
+      required: false,
+      default: null
     }
   },
   emits : [
@@ -290,7 +301,7 @@ export default {
     'focus', 'blur', 
     'edit', 'quitedit',
     'input', 'keydown', 'keyup', 'keypress',
-    'dragstart', 'dragover', 'dragenter', 'dragleave', 'dragend', 'drop',
+    'dragstart', 'dragover', 'dragenter', 'dragleave', 'dragentertree', 'dragleavetree', 'dragend', 'drop',
     'move',
     'expand', 'collapse',
     'check', 'uncheck', 'checkbox-state-change'
@@ -341,7 +352,8 @@ export default {
           mousex: 0,
           mousey: 0,
           titleMaxWidth: 'none',
-          titleTip: ''
+          titleTip: '',
+          customClasses: []
         }
       },
 
@@ -354,7 +366,9 @@ export default {
         overArea: null,
         isDroppable: false,
         clientX: null,
-        clientY: null
+        clientY: null,
+        isTouch: false,
+        from: null,
       },
       DND_STATUS: {    // enum values of dragAndDrop.status
         NONE:     0,   // there is no drag and drop interaction currently
@@ -362,6 +376,7 @@ export default {
         INTERNAL: 2,   // a node is being dragged over the tree
         INTO:     3    // an external element is being dragged over the tree
       },
+      touchStartTarget: null,
 
       //---contextmenu---
       contextMenu: {
@@ -381,12 +396,6 @@ export default {
     }
   },
   methods: {
-    traverse (fnDoSomething) {
-      for (let i=0; i<this.items.length; i++) {
-        let node = this.items[i]
-        fnDoSomething(node)
-      }
-    },
     //generate a flat array which can be rendered easily.
     getItems() {
       if (!Array.isArray(this.nodes)) {
@@ -410,7 +419,7 @@ export default {
         items.push(node)
 
         if (node.hasChild) {
-          if (!node.hasOwnProperty('children')) {
+          if (Object.prototype.hasOwnProperty.call(node, 'children') === false) {
             node.children = []
           }
 
@@ -430,7 +439,7 @@ export default {
       let dpos = 0;
 
       items.forEach(function(node, i) {
-        if (!node.hasOwnProperty('id')) {
+        if (Object.prototype.hasOwnProperty.call(node, 'id') === false) {
           node.id = this.generateId()
         }
 
@@ -511,6 +520,12 @@ export default {
         this.setAttr(node, '__', 'fullIndent',     fullIndent)
         this.setAttr(node, '__', 'titleMaxWidth',  titleMaxWidth)
 
+        let customClasses = this.getAttr(node, '__', 'customClasses')
+        if (typeof(this.fnCustomClasses) === 'function') {
+          customClasses = this.fnCustomClasses(node)
+        }
+        this.setAttr(node, '__', 'customClasses',  customClasses)
+
         if (typeof(this.fnAfterCalculate) === 'function') {
           this.fnAfterCalculate(node)
         }
@@ -523,8 +538,62 @@ export default {
       return items
     },
     reload() {
-      this.nodes = JSON.parse(JSON.stringify(this.tree)),
-      this.refresh();
+      let nodeMap = {}
+      for (const item of this.items) {
+        const id = item.id
+        nodeMap[id] = item
+      }
+
+      let nodes = []
+      let stack = []
+      stack.push({
+        srcNodes: this.tree,
+        desNodes: nodes
+      })
+
+      while (true) {
+        let pair = stack.pop()
+        if (pair === undefined) {
+          break
+        }
+        let srcNodes = pair.srcNodes
+        let desNodes = pair.desNodes
+
+        for (const srcNode of srcNodes) {
+          const id = srcNode.id
+          const desNode = nodeMap[id] !== undefined
+                        ? nodeMap[id]
+                        : {}
+
+          for (let key in srcNode) {
+            if (typeof srcNode[key] !== 'object') {
+              desNode[key] = srcNode[key]
+            } else if (key === 'style' || key === 'checkbox') {
+              if (desNode[key] === undefined) {
+                desNode[key] = {}
+              }
+              Object.assign(desNode[key], srcNode[key])
+            } else if (key === 'children') {
+              desNode[key] = []
+            }
+          }
+
+          if (srcNode.children === undefined && desNode.children !== undefined) {
+            delete  desNode.children
+          }
+
+          if (Array.isArray(srcNode.children)) {
+            stack.push({
+              srcNodes: srcNode.children,
+              desNodes: desNode.children
+            })
+          }
+          desNodes.push(desNode)
+        }
+      }
+
+      this.nodes = nodes
+      this.refresh()
     },
     refresh() {
       this.treeWidth = this.$refs.tree.offsetWidth
@@ -565,7 +634,7 @@ export default {
         let subKey = arguments[2]
         let val = arguments[3]
 
-        if (!node.hasOwnProperty(key)) {
+        if (Object.prototype.hasOwnProperty.call(node, key) === false) {
           node[key] = {}
         }
 
@@ -577,15 +646,15 @@ export default {
         let node = arguments[0]
         let key = arguments[1]
 
-        if (node.hasOwnProperty(key)) {
+        if (Object.prototype.hasOwnProperty.call(node, key) === true) {
           return node[key]
         }
 
-        if (this.defaultAttrs.hasOwnProperty(key)) {
+        if (Object.prototype.hasOwnProperty.call(this.defaultAttrs, key) === true) {
           return this.defaultAttrs[key]
         }
 
-        if (this.spareDefaultAttrs.hasOwnProperty(key)) {
+        if (Object.prototype.hasOwnProperty.call(this.spareDefaultAttrs, key) === true) {
           return this.spareDefaultAttrs[key]
         }
       }
@@ -595,15 +664,15 @@ export default {
         let key = arguments[1]
         let subKey = arguments[2]
 
-        if (node.hasOwnProperty(key) && node[key].hasOwnProperty(subKey)) {
+        if (Object.prototype.hasOwnProperty.call(node, key) === true && Object.prototype.hasOwnProperty.call(node[key], subKey) === true) {
           return node[key][subKey]
         }
 
-        if (this.defaultAttrs.hasOwnProperty(key) && this.defaultAttrs[key].hasOwnProperty(subKey)) {
+        if (Object.prototype.hasOwnProperty.call(this.defaultAttrs, key) === true && Object.prototype.hasOwnProperty.call(this.defaultAttrs[key], subKey) === true) {
           return this.defaultAttrs[key][subKey]
         }
 
-        if (this.spareDefaultAttrs.hasOwnProperty(key) && this.spareDefaultAttrs[key].hasOwnProperty(subKey)) {
+        if (Object.prototype.hasOwnProperty.call(this.spareDefaultAttrs, key) === true && Object.prototype.hasOwnProperty.call(this.spareDefaultAttrs[key], subKey) === true) {
           return this.spareDefaultAttrs[key][subKey]
         }
       }
@@ -614,87 +683,17 @@ export default {
       }
       node.title = title
     },
-    getDirectoryState(node) {
-      if (!node.hasChild) {
-        return null
-      }
-
-      let directoryState = this.getAttr(node, 'directoryState')
-      if (directoryState === null) {
-        directoryState = (this.defaultAttrs.hasOwnProperty('directoryState') && this.defaultAttrs.directoryState !== null)
-          ? this.defaultAttrs.directoryState
-          : 'expanded'
-      }
-
-      return directoryState
-    },
     generateId() {
       this.autoIdCounter += 1
       return 'vue-tree-node-' + this.autoIdCounter
     },
-    edit(node) {
-      this.setAttr(node, '__', 'inputWidth', (node.title.length + 1) + 'em')
-      this.setAttr(node, '__', 'isEditing', true)
-      this.$emit('edit', node)
-
-      nextTick().then(function(){
-        this.setAttr(node, '__', 'inputWidth', this.getHiddenTitleWidth(node))
-        let input = this.getTitleElement(node)
-        input.select()
-        input.focus()
-      }.bind(this))
-    },
-    quitEdit(node) {
-      this.setAttr(node, '__', 'isEditing', false)
-
-      nextTick().then(function(){
-        let titleElement = this.getTitleElement(node)
-        titleElement.scrollLeft = 0
-      }.bind(this))
-      this.$emit('quitedit', node)
-    },
     getTitleElement(node) {
       let refId = 'title-' + node.id
-      if (this.$refs.hasOwnProperty(refId)) {
-        return this.$refs[refId].children[0]
+      if (Object.prototype.hasOwnProperty.call(this.$refs, refId) === true) {
+        return this.$refs[refId][0].children[0]
       }
 
       return null
-    },
-    focus(node) {
-      if (this.getAttr(node, '__', 'isEditing') === true) {
-        let titleElement = this.getTitleElement(node)
-        titleElement.focus()
-      }
-    },
-    blur(node) {
-      if (this.getAttr(node, '__', 'isEditing') === true) {
-        let titleElement = this.getTitleElement(node)
-        titleElement.blur()
-      }
-    },
-    focusEvent(node, event) {
-      this.$emit('focus', node, event)
-    },
-    blurEvent(node, event) {
-      this.$emit('blur', node, event)
-    },
-    inputEvent(node, event) {
-      this.$emit('input', node, event)
-    },
-    keydownEvent(node, event) {
-      if (this.pressEnterToBlur && event.keyCode === 13) {
-        this.blur(node)
-      }
-      this.$emit('keydown', node, event)
-    },
-    keyupEvent(node, event) {
-      this.setAttr(node, '__', 'inputWidth', this.getHiddenTitleWidth(node))
-
-      this.$emit('keyup', node, event)
-    },
-    keypressEvent(node, event) {
-      this.$emit('keypress', node, event)
     },
     mouseenterEvent(node) {
       let titleElement = this.getTitleElement(node)
@@ -703,19 +702,65 @@ export default {
         : ''
       this.setAttr(node, '__', 'titleTip', tip)
     },
-    getHiddenTitleWidth(node) {
-      let hiddenRefId = 'title-hidden-' + node.id
-      if (this.$refs.hasOwnProperty(hiddenRefId)) {
-        let hiddenTitle = this.$refs[hiddenRefId]
-        let width = hiddenTitle.clientWidth
-        return (width + 5) + 'px'
+    clickEvent(node, event) {
+      this.$emit('click', node, event)
+
+      if (this.multiSelect) {
+        if (node.selected) {
+          this.deselect(node)
+        } else {
+          this.select(node)
+        }
       } else {
-        return (node.title.length + 1) + 'ch'
+        this.select(node)
+
+        if (this.getAttr(node, 'selected') === true) {
+          let selected = this.getSelected()
+          for (let item of selected) {
+            if (item !== node ) {
+              this.deselect(item)
+            }
+          }
+        }
+      }
+
+      if (this.autoHideContextMenu === true) {
+        this.hideContextMenuOnDisplay()
       }
     },
-    getNewTitle(node) {
-      return node.title
+    treeBlurEvent(e) {
+      let relatedTarget = e.relatedTarget
+      if (this.contextMenu.node !== null && this.autoHideContextMenu === true && !this.getElement(this.contextMenu.node).contains(relatedTarget)) {
+        this.hideContextMenuOnDisplay()
+      }
     },
+    getElement(node) {
+      let refId = 'node-' + node.id
+      if (Object.prototype.hasOwnProperty.call(this.$refs, refId)) {
+        return this.$refs[refId][0]
+      }
+
+      return null
+    },
+    getOffset(node) {
+      let nodeElement = this.getElement(node)
+      let offsetLeft  = nodeElement.offsetLeft
+      let offsetTop   = nodeElement.offsetTop
+
+      let reference = nodeElement.offsetParent
+      while(reference){
+        offsetLeft += reference.offsetLeft
+        offsetTop  += reference.offsetTop
+        reference   = reference.offsetParent
+      }
+
+      return {
+        left: offsetLeft,
+        top: offsetTop
+      }
+    },
+
+    //---------------------------------- select ----------------------------------------
     getSelected() {
       let selected = []
 
@@ -746,61 +791,8 @@ export default {
       this.setAttr(node, 'selected', true)
       this.$emit('select', node)
     },
-    clickEvent(node, event) {
-      this.$emit('click', node, event)
 
-      if (this.multiSelect) {
-        if (node.selected) {
-          this.deselect(node)
-        } else {
-          this.select(node)
-        }
-      } else {
-        let selected = this.getSelected()
-        for (let item of selected) {
-          if (item !== node ) {
-            this.deselect(item)
-          }
-        }
-        this.select(node)
-      }
-
-      if (this.autoHideContextMenu === true) {
-        this.hideContextMenuOnDisplay()
-      }
-    },
-    contextMenuEvent(node, event) {
-      if (typeof(this.fnBeforeContextMenu) === 'function' && this.fnBeforeContextMenu(node, event) === false) {
-        return
-      }
-
-      if (this.contextMenu.node !== node) {
-        let selected = this.getSelected()
-        for (let item of selected) {
-          if (item !== node ) {
-            this.deselect(item)
-          }
-        }
-        this.select(node)
-        this.hideContextMenuOnDisplay()
-      }
-
-      this.setAttr(node, '__', 'showContextMenu', true)
-      this.contextMenu.node = node
-      this.contextMenu.event = event
-      event.preventDefault()
-    },
-    hideContextMenuOnDisplay() {
-      if (this.contextMenu.node !== null) {
-        this.setAttr(this.contextMenu.node, '__', 'showContextMenu', false)
-      }
-    },
-    treeBlurEvent(e) {
-      let relatedTarget = e.relatedTarget
-      if (this.contextMenu.node !== null && this.autoHideContextMenu === true && !this.getElement(this.contextMenu.node).contains(relatedTarget)) {
-        this.hideContextMenuOnDisplay()
-      }
-    },
+    //--------------------------- create, remove, move ---------------------------------
     create(node, parentNode, pos) {
       if (parentNode === null) {
         if (typeof(pos) === 'undefined') {
@@ -811,7 +803,7 @@ export default {
 
       } else {
         parentNode.hasChild = true
-        if (!parentNode.hasOwnProperty('children')) {
+        if (Object.prototype.hasOwnProperty.call(parentNode, 'children') === false) {
           parentNode.children = []
         }
         if (typeof(pos) === 'undefined') {
@@ -875,7 +867,7 @@ export default {
 
       } else {
         toParent.hasChild = true
-        if (!toParent.hasOwnProperty('children')) {
+        if (Object.prototype.hasOwnProperty.call(toParent, 'children') === false) {
           toParent.children = []
         }
         if (typeof(toPos) === 'undefined') {
@@ -888,6 +880,14 @@ export default {
  
       this.refresh()
       this.$emit('move', node, fromParent, fromPos, toParent, toPos)
+    },
+
+    //--------------------------- search, sort, traverse -------------------------------
+    traverse (fnDoSomething) {
+      for (let i=0; i<this.items.length; i++) {
+        let node = this.items[i]
+        fnDoSomething(node)
+      }
     },
     search(keyword, fnMatch) {
       let matches = []
@@ -950,6 +950,22 @@ export default {
 
       this.refresh()
     },
+
+    //-------------------------------- directory ---------------------------------------
+    getDirectoryState(node) {
+      if (!node.hasChild) {
+        return null
+      }
+
+      let directoryState = this.getAttr(node, 'directoryState')
+      if (directoryState === null) {
+        directoryState = (Object.prototype.hasOwnProperty.call(this.defaultAttrs, 'directoryState') === true && this.defaultAttrs.directoryState !== null)
+          ? this.defaultAttrs.directoryState
+          : 'expanded'
+      }
+
+      return directoryState
+    },
     expand(node) {
       if (!node.hasChild) {
         return
@@ -966,33 +982,7 @@ export default {
 
       if (this.fnLoadData === null) {
         this.setAttr(node, 'directoryState', 'expanded')
-        for (let i=node.__.gpos + 1; i<this.items.length; i++) {
-          let tnode = this.items[i];
-          if (tnode.__.depth <= node.__.depth) {
-            break
-          }
-
-          let path = this.getAttr(tnode, '__', 'path')
-          let isVisible = true
-          for (let ntnode of path) {
-            if (this.getDirectoryState(ntnode) === 'collapsed') {
-              isVisible = false
-              break
-            }
-          }
-          this.setAttr(tnode, '__', 'isVisible', isVisible)
-        }
-        let dpos = node.__.dpos
-        for (let i=node.__.gpos + 1; i<this.items.length; i++) {
-          let tnode = this.items[i]
-          if (tnode.__.isVisible === true) {
-            dpos++
-            this.setAttr(tnode, '__', 'dpos', dpos)
-          } else {
-            this.setAttr(tnode, '__', 'dpos', -1)
-          }
-        }
-        //this.refresh()
+        this.refresh()
         this.$emit('expand', node)
         return
       }
@@ -1042,24 +1032,7 @@ export default {
       }
 
       this.setAttr(node, 'directoryState', 'collapsed')
-      //this.refresh()
-      for (let i=node.__.gpos + 1; i<this.items.length; i++) {
-        let tnode = this.items[i];
-        if (tnode.__.depth <= node.__.depth) {
-          break
-        }
-        this.setAttr(tnode, '__', 'isVisible', false)
-      }
-      let dpos = node.__.dpos
-      for (let i=node.__.gpos + 1; i<this.items.length; i++) {
-        let tnode = this.items[i]
-        if (tnode.__.isVisible === true) {
-          dpos++
-          this.setAttr(tnode, '__', 'dpos', dpos)
-        } else {
-          this.setAttr(tnode, '__', 'dpos', -1)
-        }
-      }
+      this.refresh()
       this.$emit('collapse', node)
     },
     expandAncestors(node) {
@@ -1067,29 +1040,134 @@ export default {
         this.expand(ancestor)
       }
     },
-    getElement(node) {
-      let refId = 'node-' + node.id
-      if (this.$refs.hasOwnProperty(refId)) {
-        return this.$refs[refId]
+
+    //------------------------------ context menu --------------------------------------
+    contextMenuEvent(node, event) {
+      if (typeof(this.fnBeforeContextMenu) === 'function' && this.fnBeforeContextMenu(node, event) === false) {
+        return
       }
 
-      return null
+      if (this.contextMenu.node !== node) {
+        let selected = this.getSelected()
+        for (let item of selected) {
+          if (item !== node ) {
+            this.deselect(item)
+          }
+        }
+        this.select(node)
+        this.hideContextMenuOnDisplay()
+      }
+
+      this.setAttr(node, '__', 'showContextMenu', true)
+      this.contextMenu.node = node
+      this.contextMenu.event = event
+      event.preventDefault()
     },
-    getOffset(node) {
-      let nodeElement = this.getElement(node)
-      let offsetLeft  = nodeElement.offsetLeft
-      let offsetTop   = nodeElement.offsetTop
+    hideContextMenuOnDisplay() {
+      if (this.contextMenu.node !== null) {
+        this.setAttr(this.contextMenu.node, '__', 'showContextMenu', false)
+      }
+    },
 
-      let reference = nodeElement.offsetParent
-      while(reference){
-        offsetLeft += reference.offsetLeft
-        offsetTop  += reference.offsetTop
-        reference   = reference.offsetParent
+    //---------------------------------- edit ------------------------------------------
+    getHiddenTitleWidth(node) {
+      let hiddenRefId = 'title-hidden-' + node.id
+      if (Object.prototype.hasOwnProperty.call(this.$refs, hiddenRefId) === true) {
+        let hiddenTitle = this.$refs[hiddenRefId][0]
+        let width = hiddenTitle.clientWidth
+        return `calc(${width}px + 2em)`
+      } else {
+        return (node.title.length + 1) + 'ch'
+      }
+    },
+    getNewTitle(node) {
+      return node.title
+    },
+    edit(node) {
+      this.setAttr(node, '__', 'inputWidth', (node.title.length + 1) + 'em')
+      this.setAttr(node, '__', 'isEditing', true)
+      this.$emit('edit', node)
+
+      nextTick().then(function(){
+        this.setAttr(node, '__', 'inputWidth', this.getHiddenTitleWidth(node))
+        let input = this.getTitleElement(node)
+        input.select()
+        input.focus()
+      }.bind(this))
+    },
+    quitEdit(node) {
+      this.setAttr(node, '__', 'isEditing', false)
+
+      nextTick().then(function(){
+        let titleElement = this.getTitleElement(node)
+        titleElement.scrollLeft = 0
+      }.bind(this))
+      this.$emit('quitedit', node)
+    },
+    focus(node) {
+      if (this.getAttr(node, '__', 'isEditing') === true) {
+        let titleElement = this.getTitleElement(node)
+        titleElement.focus()
+      }
+    },
+    blur(node) {
+      if (this.getAttr(node, '__', 'isEditing') === true) {
+        let titleElement = this.getTitleElement(node)
+        titleElement.blur()
+      }
+    },
+    focusEvent(node, event) {
+      this.$emit('focus', node, event)
+    },
+    blurEvent(node, event) {
+      this.$emit('blur', node, event)
+    },
+    inputEvent(node, event) {
+      this.$emit('input', node, event)
+    },
+    keydownEvent(node, event) {
+      if (this.pressEnterToBlur && event.keyCode === 13) {
+        this.blur(node)
+      }
+      this.$emit('keydown', node, event)
+    },
+    keyupEvent(node, event) {
+      this.setAttr(node, '__', 'inputWidth', this.getHiddenTitleWidth(node))
+
+      this.$emit('keyup', node, event)
+    },
+    keypressEvent(node, event) {
+      this.$emit('keypress', node, event)
+    },
+
+    //------------------------------ global cache --------------------------------------
+    setGlobalCache() {
+      if (Object.prototype.hasOwnProperty.call(window, 'vueTreeCache') === false) {
+        window.vueTreeCache = {}
       }
 
-      return {
-        left: offsetLeft,
-        top: offsetTop
+      if (arguments.length === 2) {
+        let key = arguments[0]
+        let val = arguments[1]
+        window.vueTreeCache[key] = val
+      } else if (arguments.length === 3) {
+        let key = arguments[0]
+        let subKey = arguments[1]
+        let val = arguments[2]
+        if (Object.prototype.hasOwnProperty.call(window.vueTreeCache, key) === false) {
+          window.vueTreeCache[key] = {}
+        }
+        window.vueTreeCache[key][subKey] = val
+      }
+    },
+    getGlobalCache() {
+      if (arguments.length === 1) {
+        let key = arguments[0]
+        return window?.vueTreeCache?.[key]
+      } else if (arguments.length === 2) {
+        let key = arguments[0]
+        let subKey = arguments[1]
+        return window?.vueTreeCache?.[key]?.[subKey]
       }
     },
 
@@ -1121,7 +1199,7 @@ export default {
       return true
     },
     isDroppable() {
-      if (this.dragAndDrop.status == this.DND_STATUS.INTERNAL && this.dropToMove === true) {
+      if (this.dragAndDrop.status === this.DND_STATUS.INTERNAL && this.dropToMove === true) {
         if (this.defaultIsDroppable() === false) {
           return false
         }
@@ -1141,6 +1219,9 @@ export default {
 
       this.dragAndDrop.status = this.DND_STATUS.INTERNAL
       this.dragAndDrop.dragNode = node
+      this.dragAndDrop.overNode = node
+      this.dragAndDrop.isTouch = false
+      this.dragAndDrop.from = null
       event.dataTransfer.setData('vue-tree', JSON.stringify({
         'treeId': this.treeId,
         'nodeId': node.id
@@ -1148,30 +1229,64 @@ export default {
       event.dataTransfer.setDragImage(this.emptyImage, 0, 0)
       event.dataTransfer.dropEffect = 'move'
       event.dataTransfer.effectAllowed = 'all'
+      this.setGlobalCache('currentDragAndDrop', {
+        isTouch: false,
+        fromTreeId: this.treeId,
+        fromNodeId: node.id,
+        beginTimestamp: Date.now(),
+      })
 
       this.$emit('dragstart', this.dragAndDrop, event)
+    },
+    calcDragAndDropStatus(clientX, clientY) {
+      if (this.$refs.tree === undefined || this.$refs.tree === null) {
+        return
+      }
+
+      let treeRect = this.$refs.tree.$el.getBoundingClientRect()
+      let isInTreeArea = clientX > treeRect.left && clientX < treeRect.right && clientY > treeRect.top && clientY < treeRect.bottom
+      let prevStatus = this.dragAndDrop.status
+
+      if (isInTreeArea === false && this.dragAndDrop.dragNode !== null) {
+        this.dragAndDrop.status = this.DND_STATUS.OUT_OF
+        if (this.dragAndDrop.overNode !== null) {
+          this.dragLeave(this.dragAndDrop.overNode)
+        }
+        if (prevStatus === this.DND_STATUS.INTERNAL) {
+          this.$emit('dragleavetree', this.dragAndDrop)
+        }
+
+      } else if (isInTreeArea === true && this.dragAndDrop.dragNode !== null) {
+        this.dragAndDrop.status = this.DND_STATUS.INTERNAL
+        if (prevStatus === this.DND_STATUS.OUT_OF) {
+          this.$emit('dragentertree', this.dragAndDrop)
+        }
+
+      } else if (isInTreeArea === true && this.dragAndDrop.dragNode === null) {
+        this.dragAndDrop.status = this.DND_STATUS.INTO
+        if (prevStatus === this.DND_STATUS.NONE) {
+          this.dragAndDrop.from = {
+            treeId: this.getGlobalCache('currentDragAndDrop', 'fromTreeId'),
+            nodeId: this.getGlobalCache('currentDragAndDrop', 'fromNodeId'),
+          }
+          this.$emit('dragentertree', this.dragAndDrop)
+        }
+
+      } else if (isInTreeArea === false && this.dragAndDrop.dragNode === null) {
+        this.dragAndDrop.status = this.DND_STATUS.NONE
+        if (prevStatus === this.DND_STATUS.INTO) {
+          this.$emit('dragleavetree', this.dragAndDrop)
+          this.dragAndDrop.from = null
+        }
+      }
+
     },
     globalDragOverEvent(event) {
       event.preventDefault()
       this.dragAndDrop.clientX = event.clientX + 'px'
       this.dragAndDrop.clientY = event.clientY + 'px'
 
-      if (this.$refs.tree === undefined || this.$refs.tree === null) {
-        return
-      }
-      let treeRect = this.$refs.tree.$el.getBoundingClientRect()
-      if (event.clientX <= treeRect.left || event.clientX >= treeRect.right || event.clientY <= treeRect.top || event.clientY >= treeRect.bottom) {
-        this.dragAndDrop.status = this.dragAndDrop.dragNode !== null
-          ? this.DND_STATUS.OUT_OF
-          : this.DND_STATUS.NONE
-        if (this.dragAndDrop.overNode !== null) {
-          this.dragLeave(this.dragAndDrop.overNode)
-        }
-      } else {
-        this.dragAndDrop.status = this.dragAndDrop.dragNode !== null
-          ? this.DND_STATUS.INTERNAL
-          : this.DND_STATUS.INTO
-      }
+      this.calcDragAndDropStatus(event.clientX, event.clientY)
     },
     dragOverEvent(node, event) {
       if (this.dragAndDrop.status === this.DND_STATUS.INTO && this.enableDropExternalElement === false) {
@@ -1231,11 +1346,23 @@ export default {
       if (this.dragAndDrop.overNode !== null) {
         this.dragLeave(this.dragAndDrop.overNode)
       }
+
+      // only the tree, one of whose node is being dragged, is allowed to mutate the global cache, or
+      // it will cause critical problems when there are multiple trees in the page.
+      if (this.dragAndDrop.dragNode !== null) {
+        this.setGlobalCache('currentDragAndDrop', 'endTimestamp', Date.now())
+        this.setGlobalCache('prevDragAndDrop', this.getGlobalCache('currentDragAndDrop'))
+        this.setGlobalCache('currentDragAndDrop', {})
+      }
+
       this.dragAndDrop.dragNode = null
       this.dragAndDrop.overArea = null
       this.dragAndDrop.clientX  = null
       this.dragAndDrop.clientY  = null
       this.dragAndDrop.status   = this.DND_STATUS.NONE
+      this.dragAndDrop.isTouch  = false
+      this.dragAndDrop.from     = null
+
       this.$emit('dragend', this.dragAndDrop, event)
     },
     moveOnDrop() {
@@ -1290,11 +1417,159 @@ export default {
     },
     getShallowCopyOfDragAndDrop () {
       return {
+        isTouch:  this.dragAndDrop.isTouch,
         status:   this.dragAndDrop.status,
         dragNode: this.dragAndDrop.dragNode,
         overNode: this.dragAndDrop.overNode,
-        overArea: this.dragAndDrop.overArea
+        overArea: this.dragAndDrop.overArea,
+        from:     this.dragAndDrop.from
       }
+    },
+    getDragFrom() {
+      let fromTreeId = this.getGlobalCache('currentDragAndDrop', 'fromTreeId')
+      if (fromTreeId === null || fromTreeId === undefined) {
+        fromTreeId = this.getGlobalCache('prevDragAndDrop', 'fromTreeId')
+      }
+
+      let fromNodeId = this.getGlobalCache('currentDragAndDrop', 'fromNodeId')
+      if (fromNodeId === null || fromNodeId === undefined) {
+        fromNodeId = this.getGlobalCache('prevDragAndDrop', 'fromNodeId')
+      }
+
+      return {
+        treeId: fromTreeId,
+        nodeId: fromNodeId,
+      }
+    },
+
+    //-------------------------------------- touch support-------------------------------------------
+    touchStartEvent(node, event) {
+      if (this.enableTouchSupport === false) {
+        return
+      }
+
+      if (event.touches.length > 1) {
+        return
+      }
+
+      if (typeof(this.fnBeforeDrag) === 'function' && this.fnBeforeDrag(node) === false) {
+        event.preventDefault()
+        return
+      }
+
+      this.touchStartTarget = event.touches.item(0).target
+      this.dragAndDrop.status = this.DND_STATUS.INTERNAL
+      this.dragAndDrop.dragNode = node
+      this.dragAndDrop.overNode = node
+      this.dragAndDrop.isTouch = true
+      this.dragAndDrop.from = null
+      this.dragEnter(node)
+
+      this.setGlobalCache('currentDragAndDrop', {
+        isTouch: true,
+        fromTreeId: this.treeId,
+        fromNodeId: node.id,
+        touchStartTarget: event.touches.item(0).target,
+        beginTimestamp: Date.now(),
+      })
+
+      this.$emit('dragstart', this.dragAndDrop, event)
+    },
+    globalTouchEndEvent(event) {
+      if (this.enableTouchSupport === false) {
+        this.dragEndEvent(event)
+        return
+      }
+
+      if (event.changedTouches.length > 1) {
+        this.dragEndEvent(event)
+        return
+      }
+
+      if (this.dragAndDrop.status === this.DND_STATUS.INTERNAL || this.dragAndDrop.status === this.DND_STATUS.INTO) {
+        this.dropEvent(event)
+      }
+      this.dragEndEvent(event)
+    },
+    globalTouchCancelEvent(event) {
+      this.dragEndEvent(event)
+    },
+    globalTouchMoveEvent(event) {
+      if (this.enableTouchSupport === false) {
+        return
+      }
+
+      if (event.touches.length > 1) {
+        return
+      }
+
+      if (this.dragAndDrop.dragNode !== null) {
+        event.preventDefault()
+      }
+
+      let touch = event.touches.item(0)
+      this.dragAndDrop.clientX = touch.clientX + 'px'
+      this.dragAndDrop.clientY = touch.clientY + 'px'
+      this.dragAndDrop.isTouch = true
+
+      this.calcDragAndDropStatus(touch.clientX, touch.clientY)
+      if (this.dragAndDrop.status === this.DND_STATUS.INTO && this.enableDropExternalElement === false) {
+        return
+      }
+      if (this.dragAndDrop.status === this.DND_STATUS.INTERNAL || this.dragAndDrop.status === this.DND_STATUS.INTO) {
+        this.whichNodeIsBeingTouchedOver(event)
+      }
+    },
+    whichNodeIsBeingTouchedOver(event) {
+      if (this.dragAndDrop.status !== this.DND_STATUS.INTERNAL
+          && this.dragAndDrop.status !== this.DND_STATUS.INTO) {
+        return
+      }
+
+      let touch = event.touches.item(0)
+      let step = 1
+      let from = 0
+
+      if (this.dragAndDrop.overNode !== null) {
+        from = this.getAttr(this.dragAndDrop.overNode, '__', 'gpos')
+        let nodeElement = this.getElement(this.dragAndDrop.overNode)
+        let nodeOffset  = this.getOffset(this.dragAndDrop.overNode)
+        let nodeHeight = nodeElement.clientHeight
+
+        if (touch.pageY < nodeOffset.top) {
+          step = -1
+        } else if (touch.pageY > nodeOffset.top + nodeHeight) {
+          step = 1
+        }
+      } 
+
+      let cur = from
+      while (cur >=0 && cur < this.items.length) {
+        let cnode = this.getByGpos(cur)
+        let cnodeElement = this.getElement(cnode)
+        let cnodeOffset = this.getOffset(cnode)
+        let cnodeHeight = cnodeElement.clientHeight
+        let y = touch.pageY - cnodeOffset.top
+
+        if ( y < 0 || y > cnodeHeight) {
+          cur += step
+          continue
+        }
+
+        event.pageX = touch.pageX
+        event.pageY = touch.pageY
+        this.dragOverEvent(cnode, event)
+        break
+      }
+    },
+    isTheTouchOperationFromTheTree(event) {
+      if ((event.type === 'touchend' && event.changedTouches.item(0).target === this.touchStartTarget)
+          || (event.type === 'touchmove' && event.touches.item(0).target === this.touchStartTarget)
+          || (event.type === 'touchcancel' && event.changedTouches.item(0).target === this.touchStartTarget)) {
+        return true
+      }
+ 
+      return false
     },
 
 
@@ -1497,9 +1772,14 @@ export default {
     this.refresh()
 
     //drag and drop
-    document.body.addEventListener('dragover', this.globalDragOverEvent.bind(this))
+    document.body.addEventListener('dragover', this.globalDragOverEvent.bind(this), {capture: true})
     this.emptyImage = new Image()
     this.emptyImage.src = 'data:image/gif;base64,R0lGODlhAQABAIAAAAUEBAAAACwAAAAAAQABAAACAkQBADs='
+
+    //touch devices
+    document.body.addEventListener('touchcancel', this.globalTouchCancelEvent.bind(this), {capture: true})
+    document.body.addEventListener('touchmove', this.globalTouchMoveEvent.bind(this), {capture:true, passive: false})
+    document.body.addEventListener('touchend', this.globalTouchEndEvent.bind(this), {capture:true, passive: false})
 
     //calculate the tree's width
     this.treeWidthInterval = setInterval(function(){
@@ -1511,6 +1791,10 @@ export default {
   },
   beforeUnmount() {
     clearInterval(this.treeWidthInterval)
+    document.removeEventListener('dragover', this.globalDragOverEvent.bind(this), {capture: true})
+    document.removeEventListener('touchend', this.globalTouchEndEvent.bind(this), {capture: true})
+    document.removeEventListener('touchmove', this.globalTouchMoveEvent.bind(this), {capture: true})
+    document.removeEventListener('touchcancel', this.globalTouchCancelEvent.bind(this), {capture: true})
   }
 }
 </script>
