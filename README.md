@@ -1,24 +1,24 @@
 # VueTree
 [![GitHub](https://img.shields.io/github/license/tinywisp/vue-tree)](https://github.com/TinyWisp/vue-tree/master/LICENSE)
-[![npm](https://img.shields.io/npm/v/vue-tree)](https://www.npmjs.com/package/vue-tree)
+[![npm](https://img.shields.io/npm/v/@tinywisp/vue-tree)](https://www.npmjs.com/package/@tinywisp/vue-tree)
 [![codecov](https://codecov.io/gh/TinyWisp/vue-tree/branch/master/graph/badge.svg)](https://codecov.io/gh/TinyWisp/vue-tree)
-![Travis (.org)](https://img.shields.io/travis/TinyWisp/vue-tree)
 
- 基于vue 3的树形组件。
+ 基于vue3的树形组件。
 
 * [主要特色](#主要特色)
 * [开始使用](#开始使用)
 * [文档](https://github.com/TinyWisp/vue-tree/wiki/%E6%96%87%E6%A1%A3)
-* [示例](https://tinywisp.gitee.io/vue-tree/#/zh/)
+* [示例](https://tinywisp.github.io/vue-tree/#/zh/)
 * [开源协议](#开源协议)
+* [vue 2](#vue2)
 
-A highly customizable tree component for vue 3.
+A highly customizable tree component for vue3.
 * [Features](#features)
 * [Getting Started](#getting-started)
 * [Document](https://github.com/TinyWisp/vue-tree/wiki/Document)
 * [Demos](https://tinywisp.github.io/vue-tree/#/en/)
 * [License](#license)
-
+* [vue 2](#vue-2)
 
 ## 主要特色
  *  支持复选框
@@ -27,6 +27,7 @@ A highly customizable tree component for vue 3.
  *  右键菜单
  *  按钮
  *  自定义外观
+ *  触屏支持
 
 ## 文档
  *  [文档](https://github.com/TinyWisp/vue-tree/wiki/%E6%96%87%E6%A1%A3)
@@ -121,7 +122,10 @@ export default {
 ## 开源协议
  * MIT
  * 无论个人还是公司，都可以免费自由使用
- 
+
+### vue2
+ * [点击此处](https://github.com/TinyWisp/twtree)查看对vue2的支持
+
  ---
  
 
@@ -132,6 +136,7 @@ export default {
  *  context menu
  *  button
  *  customizable appearance
+ *  touch support
 
 ## Getting Started
 
@@ -226,4 +231,7 @@ export default {
 ## License
  * MIT
  * it is free for commercial use.
- 
+
+### vue 2
+ * [click here](https://github.com/TinyWisp/twtree) for vue2 support.
+
