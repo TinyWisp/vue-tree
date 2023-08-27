@@ -1,173 +1,174 @@
 <template>
-  <div class="vue-tree-wrapper">
-      <transition-group
-        tag="ul" 
-        name="vue-tree-node"
-        class="vue-tree"
-        ref="tree"
-        tabindex="1"
-        @blur="treeBlurEvent"
-        :style="{
-          '--dragImageOffsetX': dragImageOffsetX,
-          '--dragImageOffsetY': dragImageOffsetY,
-          '--animationDuration': animationDuration,
-          '--treeWidth': treeWidth + 'px'
-        }">
-        <template v-for="item of items">
-          <li
-            v-if="item.__.isVisible"
-            :class="[
-              'vue-tree-node',
-              {'vue-tree-node-selected':       item.selected},
-              {'vue-tree-node-search-result':  item.__.isSearchResult},
-              {'vue-tree-node-drag-over-prev': item.__.dragOverArea === 'prev' && item.__.isDroppable},
-              {'vue-tree-node-drag-over-next': item.__.dragOverArea === 'next' && item.__.isDroppable},
-              {'vue-tree-node-drag-over-self': item.__.dragOverArea === 'self' && item.__.isDroppable},
-              ...item.__.customClasses
-            ]"
-            :style="{
-              '--fullIndent':          item.__.fullIndent,
-              '--height':              item.style.height,
-              '--fontSize':            item.style.fontSize,
-              '--bgColor':             item.style.bgColor,
-              '--hoverBgColor':        item.style.hoverBgColor,
-              '--selectedBgColor':     item.style.selectedBgColor,
-              '--dragOverBgColor':     item.style.dragOverBgColor,
-              '--switcherMarginRight': item.style.switcherMarginRight,
-              '--iconMarginRight':     item.style.iconMarginRight,
-              '--checkboxMarginRight': item.style.checkboxMarginRight,
-              '--extraFloat':          item.style.extraFloatRight ? 'right' : 'none',
-              '--extraDisplay':        item.style.extraAlwaysVisible ? 'inline-block' : 'none',
-              '--titleMaxWidth':       item.__.titleMaxWidth,
-              '--titleOverflow':       item.style.titleOverflow,
-              '--mousex':              item.__.mousex,
-              '--mousey':              item.__.mousey,
-              '--marginTop':           item.style.marginTop,
-              '--marginBottom':        item.style.marginBottom
-            }"
-            :draggable="!item.__.isEditing"
-            @click = "clickEvent(item, $event)"
-            @contextmenu = "contextMenuEvent(item, $event)"
-            @dragstart="dragStartEvent(item, $event)"
-            @dragover="dragOverEvent(item, $event)"
-            @dragend="dragEndEvent($event)"
-            @drop="dropEvent($event)"
-            @dragenter="dragEnterEvent($event)"
-            @touchstart="touchStartEvent(item, $event)"
-            :ref="'node-' + item.id"
-            :key="item.id">
-            <span class="vue-tree-switcher-wrapper" v-if="item.style.showSwitcher" @click.stop="toggleDirectoryState(item)">
-              <slot name="switcher" v-bind:node="item">
-                <svg class="vue-tree-switcher-icon vue-tree-switcher-expanded" viewBox="-7 -3 46 46" fill="currentColor" aria-hidden="true" v-if="item.directoryState === 'expanded'">
-                  <path d="M30 10 L16 26 2 10 Z" />
-                </svg>
-                <svg class="vue-tree-switcher-icon vue-tree-switcher-collapsed" viewBox="-7 -3 46 46" fill="currentColor" aria-hidden="true" v-else-if="item.directoryState === 'collapsed'">
-                  <path d="M10 30 L26 16 10 2 Z" />
-                </svg>
-                <svg class="vue-tree-switcher-icon vue-tree-switcher-loading" viewBox="0 0 32 32" fill="none" stroke="currentcolor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" v-else-if="item.directoryState === 'loading'">
-                  <path d="M29 16 C29 22 24 29 16 29 8 29 3 22 3 16 3 10 8 3 16 3 21 3 25 6 27 9 M20 10 L27 9 28 2" />
-                </svg>
-              </slot>
-            </span>
-            <span class="vue-tree-checkbox-wrapper" v-if="item.checkbox.show" @click.stop="toggleCheckbox(item)">
-              <slot name="checkbox" v-bind:node="item">
-                <span
-                  :class="{
-                    'vue-tree-checkbox':              true,
-                    'vue-tree-checkbox-checked':      item.checkbox.state === 'checked',
-                    'vue-tree-checkbox-unchecked':    item.checkbox.state === 'unchecked',
-                    'vue-tree-checkbox-undetermined': item.checkbox.state === 'undetermined',
-                    'vue-tree-checkbox-disabled':     item.checkbox.disable
-                  }">
-                </span>
-              </slot>
-            </span>
-            <span class="vue-tree-icon-and-title" :ref="'icon-and-title-' + item.id ">
-              <span class="vue-tree-icon-wrapper" v-if="item.style.showIcon">
-                <slot name="icon" v-bind:node="item">
-                  <svg viewBox="0 0 32 32" fill="none" stroke="currentcolor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" class="vue-tree-icon" v-if="item.hasChild && (item.directoryState === 'collapsed' || item.directoryState === 'expanded')">
-                    <path d="M2 26 L30 26 30 7 14 7 10 4 2 4 Z M30 12 L2 12" />
-                  </svg>
-                  <svg viewBox="0 0 32 32" fill="none" stroke="currentcolor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" class="vue-tree-icon" v-else>
-                    <path d="M6 2 L6 30 26 30 26 10 18 2 Z M18 2 L18 10 26 10" />
-                  </svg>
-                </slot>
+  <div
+    class="vue-tree-wrapper"
+    tabindex="1"
+    @dragend="dragEndEvent($event)"
+    @blur="treeBlurEvent"
+    :style="{
+      '--dragImageOffsetX': dragImageOffsetX,
+      '--dragImageOffsetY': dragImageOffsetY,
+      '--animationDuration': animationDuration,
+      '--treeWidth': treeWidth + 'px'
+    }">
+    <transition-group
+      tag="ul" 
+      name="vue-tree-node"
+      class="vue-tree"
+      ref="tree">
+      <template v-for="item of items">
+        <li
+          v-if="item.__.isVisible"
+          :class="[
+            'vue-tree-node',
+            {'vue-tree-node-selected':       item.selected},
+            {'vue-tree-node-search-result':  item.__.isSearchResult},
+            ...item.__.customClasses
+          ]"
+          :style="{
+            '--fullIndent':          item.__.fullIndent,
+            '--height':              item.style.height,
+            '--fontSize':            item.style.fontSize,
+            '--bgColor':             item.style.bgColor,
+            '--hoverBgColor':        item.style.hoverBgColor,
+            '--selectedBgColor':     item.style.selectedBgColor,
+            '--dragOverBgColor':     item.style.dragOverBgColor,
+            '--switcherMarginRight': item.style.switcherMarginRight,
+            '--iconMarginRight':     item.style.iconMarginRight,
+            '--checkboxMarginRight': item.style.checkboxMarginRight,
+            '--extraFloat':          item.style.extraFloatRight ? 'right' : 'none',
+            '--extraDisplay':        item.style.extraAlwaysVisible ? 'inline-block' : 'none',
+            '--titleMaxWidth':       item.__.titleMaxWidth,
+            '--titleOverflow':       item.style.titleOverflow,
+            '--marginTop':           item.style.marginTop,
+            '--marginBottom':        item.style.marginBottom
+          }"
+          :draggable="!item.__.isEditing"
+          @click = "clickEvent(item, $event)"
+          @contextmenu = "contextMenuEvent(item, $event)"
+          @dragstart="dragStartEvent(item, $event)"
+          @dragover="dragOverEvent(item, $event)"
+          @drop="dropEvent($event)"
+          @dragenter="dragEnterEvent($event)"
+          @touchstart="touchStartEvent(item, $event)"
+          :ref="'node-' + item.id"
+          :key="item.id">
+          <span class="vue-tree-switcher-wrapper" v-if="item.style.showSwitcher" @click.stop="toggleDirectoryState(item)">
+            <slot name="switcher" v-bind:node="item">
+              <svg class="vue-tree-switcher-icon vue-tree-switcher-expanded" viewBox="-7 -3 46 46" fill="currentColor" aria-hidden="true" v-if="item.directoryState === 'expanded'">
+                <path d="M30 10 L16 26 2 10 Z" />
+              </svg>
+              <svg class="vue-tree-switcher-icon vue-tree-switcher-collapsed" viewBox="-7 -3 46 46" fill="currentColor" aria-hidden="true" v-else-if="item.directoryState === 'collapsed'">
+                <path d="M10 30 L26 16 10 2 Z" />
+              </svg>
+              <svg class="vue-tree-switcher-icon vue-tree-switcher-loading" viewBox="0 0 32 32" fill="none" stroke="currentcolor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" v-else-if="item.directoryState === 'loading'">
+                <path d="M29 16 C29 22 24 29 16 29 8 29 3 22 3 16 3 10 8 3 16 3 21 3 25 6 27 9 M20 10 L27 9 28 2" />
+              </svg>
+            </slot>
+          </span>
+          <span class="vue-tree-checkbox-wrapper" v-if="item.checkbox.show" @click.stop="toggleCheckbox(item)">
+            <slot name="checkbox" v-bind:node="item">
+              <span
+                :class="{
+                  'vue-tree-checkbox':              true,
+                  'vue-tree-checkbox-checked':      item.checkbox.state === 'checked',
+                  'vue-tree-checkbox-unchecked':    item.checkbox.state === 'unchecked',
+                  'vue-tree-checkbox-undetermined': item.checkbox.state === 'undetermined',
+                  'vue-tree-checkbox-disabled':     item.checkbox.disable
+                }">
               </span>
-              <span class="vue-tree-title-wrapper" :ref="'title-' + item.id">
-                  <template v-if="item.__.isEditing">
-                    <slot name="input" v-bind:node="item">
-                      <input
-                        type="text"
-                        v-model="item.title"
-                        class="vue-tree-title vue-tree-title-editing"
-                        :title="item.__.titleTip"
-                        :ref="'title-input-' + item.id"
-                        :style="{width: item.__.inputWidth}"
-                        @keydown="keydownEvent(item, $event)"
-                        @keyup="keyupEvent(item, $event)"
-                        @keypress="keypressEvent(item, $event)"
-                        @input="inputEvent(item, $event)"
-                        @focus="focusEvent(item, $event)"
-                        @blur="blurEvent(item)"
-                        @mouseenter="mouseenterEvent(item)"/>
-                      <span
-                        :ref="'title-hidden-' + item.id"
-                        class="vue-tree-title vue-tree-title-editing vue-tree-title-hidden">{{item.title}}</span>
-                    </slot>
-                  </template>
-                  <template v-else>
-                  <slot name="title" v-bind:node="item">
-                    <span
-                      class="vue-tree-title"
+            </slot>
+          </span>
+          <span class="vue-tree-icon-and-title" :ref="'icon-and-title-' + item.id ">
+            <span class="vue-tree-icon-wrapper" v-if="item.style.showIcon">
+              <slot name="icon" v-bind:node="item">
+                <svg viewBox="0 0 32 32" fill="none" stroke="currentcolor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" class="vue-tree-icon" v-if="item.hasChild && (item.directoryState === 'collapsed' || item.directoryState === 'expanded')">
+                  <path d="M2 26 L30 26 30 7 14 7 10 4 2 4 Z M30 12 L2 12" />
+                </svg>
+                <svg viewBox="0 0 32 32" fill="none" stroke="currentcolor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" class="vue-tree-icon" v-else>
+                  <path d="M6 2 L6 30 26 30 26 10 18 2 Z M18 2 L18 10 26 10" />
+                </svg>
+              </slot>
+            </span>
+            <span class="vue-tree-title-wrapper" :ref="'title-' + item.id">
+                <template v-if="item.__.isEditing">
+                  <slot name="input" v-bind:node="item">
+                    <input
+                      type="text"
+                      v-model="item.title"
+                      class="vue-tree-title vue-tree-title-editing"
                       :title="item.__.titleTip"
-                    >{{item.title}}</span>
+                      :ref="'title-input-' + item.id"
+                      :style="{width: item.__.inputWidth}"
+                      @keydown="keydownEvent(item, $event)"
+                      @keyup="keyupEvent(item, $event)"
+                      @keypress="keypressEvent(item, $event)"
+                      @input="inputEvent(item, $event)"
+                      @focus="focusEvent(item, $event)"
+                      @blur="blurEvent(item)"
+                      @mouseenter="mouseenterEvent(item)"/>
+                    <span
+                      :ref="'title-hidden-' + item.id"
+                      class="vue-tree-title vue-tree-title-editing vue-tree-title-hidden">{{item.title}}</span>
                   </slot>
-                  </template>
-              </span>
+                </template>
+                <template v-else>
+                <slot name="title" v-bind:node="item">
+                  <span
+                    class="vue-tree-title"
+                    :title="item.__.titleTip"
+                  >{{item.title}}</span>
+                </slot>
+                </template>
             </span>
-            <span class="vue-tree-extra-wrapper">
-              <slot name="extra" v-bind:node="item">
-              </slot>
-            </span>
-            <div
-              v-if="item.__.showContextMenu"
-              class="vue-tree-contextmenu-wrapper"
-              :style="{
-                '--mousex': contextMenu.event.clientX + 'px',
-                '--mousey': contextMenu.event.clientY + 'px'
-              }">
-              <slot name="contextmenu" v-bind:node="item">
-              </slot>
-            </div>
-            <div class="vue-tree-drag-arrow-wrapper" v-if="item.__.dragOverArea !== null">
-              <slot name="drag-arrow" v-bind:node="item">
-                <svg class="vue-tree-arrow" viewBox="0 0 24 24">
-                  <path d="M16.01 11H4v2h12.01v3L20 12l-3.99-4z"/>
-                </svg>
-              </slot>
-            </div>
-            <div 
-              v-if="dragAndDrop.dragNode === item && (enableDragNodeOut === true || dragAndDrop.status === DND_STATUS.INTERNAL) && dragAndDrop.clientX !== null"
-              class="vue-tree-drag-image-wrapper"
-              :style="{
-                '--mousex': dragAndDrop.clientX,
-                '--mousey': dragAndDrop.clientY
-              }"> 
-              <slot name="drag-image" v-bind:node="item" v-bind:dnd="dragAndDrop">
-                <span class="vue-tree-drag-image">{{dragAndDrop.dragNode.title}}</span>
-              </slot>
-            </div>
-          </li>
-        </template>
-      </transition-group>
+          </span>
+          <span class="vue-tree-extra-wrapper">
+            <slot name="extra" v-bind:node="item">
+            </slot>
+          </span>
+          <div
+            v-if="item.__.showContextMenu"
+            class="vue-tree-contextmenu-wrapper"
+            :style="{
+              '--mousex': contextMenu.event.clientX + 'px',
+              '--mousey': contextMenu.event.clientY + 'px'
+            }">
+            <slot name="contextmenu" v-bind:node="item">
+            </slot>
+          </div>
+        </li>
+      </template>
+    </transition-group>
+    <drag-image
+      :dragAndDrop="dragAndDrop"
+      :DND_STATUS="DND_STATUS"
+      :enableDragNodeOut="enableDragNodeOut">
+      <template v-slot:default>
+        <slot name="drag-image" v-bind:node="dragAndDrop.dragNode" v-bind:dnd="dragAndDrop">
+          <span class="vue-tree-drag-image">{{dragAndDrop.dragNode.title}}</span>
+        </slot>
+      </template>
+    </drag-image>
+    <drag-arrow
+      :dragAndDrop="dragAndDrop">
+      <template v-slot:default>
+        <slot name="drag-arrow" v-bind:node="dragAndDrop.overNode" v-bind:dnd="dragAndDrop">
+          <svg class="vue-tree-drag-arrow" viewBox="0 0 24 24">
+            <path d="M16.01 11H4v2h12.01v3L20 12l-3.99-4z"/>
+          </svg>
+        </slot>
+      </template>
+    </drag-arrow>
   </div>
 </template>
 
 <script>
 import { nextTick } from 'vue'
+import DragImage from './DragImage.vue'
+import DragArrow from './DragArrow.vue'
 
 export default {
   name: 'vue-tree',
+  components: { DragImage, DragArrow },
   props: {
     tree: {
       type: Array,
@@ -349,8 +350,6 @@ export default {
           dragOverArea: null,
           indent: '20px',
           height: '2em',
-          mousex: 0,
-          mousey: 0,
           titleMaxWidth: 'none',
           titleTip: '',
           customClasses: []
@@ -364,6 +363,7 @@ export default {
         dragNode: null,
         overNode: null,
         overArea: null,
+        overRect: {left: null, top: null, width: null, height: null},
         isDroppable: false,
         clientX: null,
         clientY: null,
@@ -419,8 +419,8 @@ export default {
         items.push(node)
 
         if (node.hasChild) {
-          if (Object.prototype.hasOwnProperty.call(node, 'children') === false) {
-            node.children = []
+          if (!Object.prototype.hasOwnProperty.call(node, 'children')) {
+            this.$set(node, 'children', [])
           }
 
           for (let i=node.children.length-1; i>=0; i--) {
@@ -437,33 +437,35 @@ export default {
       }
 
       let dpos = 0;
+      let prevCollapsedDirectoryDepth = 99999
 
-      items.forEach(function(node, i) {
-        if (Object.prototype.hasOwnProperty.call(node, 'id') === false) {
-          node.id = this.generateId()
+      for (let i=0; i<items.length; i++) {
+        const node = items[i]
+
+        if (!Object.prototype.hasOwnProperty.call(node, 'id')) {
+          this.setAttr(node, 'id', this.generateId())
         }
 
-        let path = this.getAttr(node, '__', 'path')
-        let isVisible = true
-        for (let tnode of path) {
-          if (this.getDirectoryState(tnode) === 'collapsed') {
-            isVisible = false
-            break
-          }
+        const depth = this.getAttr(node, '__', 'depth')
+        const isVisible = depth <= prevCollapsedDirectoryDepth
+        if (isVisible) {
+          const dirState = this.getDirectoryState(node)
+          prevCollapsedDirectoryDepth = dirState === 'collapsed'
+            ? depth
+            : 99999
         }
 
+        const path = this.getAttr(node, '__', 'path')
+        const indent = this.getAttr(node, 'style', 'indent')
         let fullIndent = 0
         if (path.length === 1) {
-          fullIndent = this.getAttr(node, 'style', 'indent')
-        } else if (path.length > 1) {
-          let indents = []
-          for (let j=1; j<path.length; j++) {
-            let indent = this.getAttr(path[j], 'style', 'indent')
-            indents.push(indent)
-          }
-          let indent = this.getAttr(node, 'style', 'indent')
-          indents.push(indent)
-          fullIndent = 'calc(' + indents.join(' + ') + ')'
+          fullIndent = indent
+        } else if (path.length === 2) {
+          const parentIndent = this.getAttr(path[path.length - 1], 'style', 'indent')
+          fullIndent = `calc(${indent} + ${parentIndent})`
+        } else if (path.length > 2) {
+          const parentFullIndent = this.getAttr(path[path.length - 1], '__', 'fullIndent')
+          fullIndent = 'calc(' + indent + ' + ' + parentFullIndent.substring(5)
         }
 
         let titleMaxWidth = this.getAttr(node, 'style', 'titleMaxWidth')
@@ -480,49 +482,51 @@ export default {
           titleMaxWidth = 'calc(' + (parseFloat(titleMaxWidth) / 100.0) + ' * var(--treeWidth))'
         }
 
-        this.setAttr(node, 'directoryState',  this.getDirectoryState(node))
-        this.setAttr(node, 'selected',        this.getAttr(node, 'selected'))
-
-        this.setAttr(node, 'checkbox', 'show',    this.getAttr(node, 'checkbox', 'show'))
-        this.setAttr(node, 'checkbox', 'disable', this.getAttr(node, 'checkbox', 'disable'))
-        this.setAttr(node, 'checkbox', 'state',   this.getAttr(node, 'checkbox', 'state'))
-
-        this.setAttr(node, 'style', 'height',              this.getAttr(node, 'style', 'height'))
-        this.setAttr(node, 'style', 'indent',              this.getAttr(node, 'style', 'indent'))
-        this.setAttr(node, 'style', 'fontSize',            this.getAttr(node, 'style', 'fontSize'))
-        this.setAttr(node, 'style', 'bgColor',             this.getAttr(node, 'style', 'bgColor'))
-        this.setAttr(node, 'style', 'hoverBgColor',        this.getAttr(node, 'style', 'hoverBgColor'))
-        this.setAttr(node, 'style', 'selectedBgColor',     this.getAttr(node, 'style', 'selectedBgColor'))
-        this.setAttr(node, 'style', 'dragOverBgColor',     this.getAttr(node, 'style', 'dragOverBgColor'))
-        this.setAttr(node, 'style', 'switcherMarginRight', this.getAttr(node, 'style', 'switcherMarginRight'))
-        this.setAttr(node, 'style', 'iconMarginRight',     this.getAttr(node, 'style', 'iconMarginRight'))
-        this.setAttr(node, 'style', 'checkboxMarginRight', this.getAttr(node, 'style', 'checkboxMarginRight'))
-        this.setAttr(node, 'style', 'extraFloatRight',     this.getAttr(node, 'style', 'extraFloatRight'))
-        this.setAttr(node, 'style', 'extraAlwaysVisible',  this.getAttr(node, 'style', 'extraAlwaysVisible'))
-        this.setAttr(node, 'style', 'titleMaxWidth',       this.getAttr(node, 'style', 'titleMaxWidth'))
-        this.setAttr(node, 'style', 'titleOverflow',       this.getAttr(node, 'style', 'titleOverflow'))
-        this.setAttr(node, 'style', 'marginTop',           this.getAttr(node, 'style', 'marginTop'))
-        this.setAttr(node, 'style', 'marginBottom',        this.getAttr(node, 'style', 'marginBottom'))
-        this.setAttr(node, 'style', 'showSwitcher',        this.getAttr(node, 'style', 'showSwitcher'))
-        this.setAttr(node, 'style', 'showIcon',            this.getAttr(node, 'style', 'showIcon'))
-
+        this.setAttr(node, 'directoryState',       this.getDirectoryState(node))
         this.setAttr(node, '__', 'dpos',           isVisible ? dpos : -1)
         this.setAttr(node, '__', 'gpos',           i)
         this.setAttr(node, '__', 'isVisible',      isVisible)
-        this.setAttr(node, '__', 'isEditing',      this.getAttr(node, '__', 'isEditing'))
-        this.setAttr(node, '__', 'isSearchResult', this.getAttr(node, '__', 'isSearchResult'))
-        this.setAttr(node, '__', 'isDroppable',    this.getAttr(node, '__', 'isDroppable'))
-        this.setAttr(node, '__', 'dragOverArea',   this.getAttr(node, '__', 'dragOverArea'))
-        this.setAttr(node, '__', 'height',         this.getAttr(node, '__', 'height'))
-        this.setAttr(node, '__', 'mousex',         this.getAttr(node, '__', 'mousex'))
-        this.setAttr(node, '__', 'mousey',         this.getAttr(node, '__', 'mousey'))
-        this.setAttr(node, '__', 'titleTip',       this.getAttr(node, '__', 'titleTip'))
         this.setAttr(node, '__', 'fullIndent',     fullIndent)
         this.setAttr(node, '__', 'titleMaxWidth',  titleMaxWidth)
+
+        if (!this.getAttr(node, '__', 'isInited')) {
+          this.setAttr(node, 'selected',                          this.getAttr(node, 'selected'))
+          this.setAttr(node, 'checkbox',  'show',                 this.getAttr(node, 'checkbox', 'show'))
+          this.setAttr(node, 'checkbox',  'disable',              this.getAttr(node, 'checkbox', 'disable'))
+          this.setAttr(node, 'checkbox',  'state',                this.getAttr(node, 'checkbox', 'state'))
+          this.setAttr(node, 'style',     'height',               this.getAttr(node, 'style', 'height'))
+          this.setAttr(node, 'style',     'indent',               this.getAttr(node, 'style', 'indent'))
+          this.setAttr(node, 'style',     'fontSize',             this.getAttr(node, 'style', 'fontSize'))
+          this.setAttr(node, 'style',     'bgColor',              this.getAttr(node, 'style', 'bgColor'))
+          this.setAttr(node, 'style',     'hoverBgColor',         this.getAttr(node, 'style', 'hoverBgColor'))
+          this.setAttr(node, 'style',     'selectedBgColor',      this.getAttr(node, 'style', 'selectedBgColor'))
+          this.setAttr(node, 'style',     'dragOverBgColor',      this.getAttr(node, 'style', 'dragOverBgColor'))
+          this.setAttr(node, 'style',     'switcherMarginRight',  this.getAttr(node, 'style', 'switcherMarginRight'))
+          this.setAttr(node, 'style',     'iconMarginRight',      this.getAttr(node, 'style', 'iconMarginRight'))
+          this.setAttr(node, 'style',     'checkboxMarginRight',  this.getAttr(node, 'style', 'checkboxMarginRight'))
+          this.setAttr(node, 'style',     'extraFloatRight',      this.getAttr(node, 'style', 'extraFloatRight'))
+          this.setAttr(node, 'style',     'extraAlwaysVisible',   this.getAttr(node, 'style', 'extraAlwaysVisible'))
+          this.setAttr(node, 'style',     'titleMaxWidth',        this.getAttr(node, 'style', 'titleMaxWidth'))
+          this.setAttr(node, 'style',     'titleOverflow',        this.getAttr(node, 'style', 'titleOverflow'))
+          this.setAttr(node, 'style',     'marginTop',            this.getAttr(node, 'style', 'marginTop'))
+          this.setAttr(node, 'style',     'marginBottom',         this.getAttr(node, 'style', 'marginBottom'))
+          this.setAttr(node, 'style',     'showSwitcher',         this.getAttr(node, 'style', 'showSwitcher'))
+          this.setAttr(node, 'style',     'showIcon',             this.getAttr(node, 'style', 'showIcon'))
+          this.setAttr(node, '__',        'isEditing',            this.getAttr(node, '__', 'isEditing'))
+          this.setAttr(node, '__',        'isSearchResult',       this.getAttr(node, '__', 'isSearchResult'))
+          this.setAttr(node, '__',        'dragOverArea',         this.getAttr(node, '__', 'dragOverArea'))
+          this.setAttr(node, '__',        'isDroppable',          this.getAttr(node, '__', 'isDroppable'))
+          this.setAttr(node, '__',        'titleTip',             this.getAttr(node, '__', 'titleTip'))
+
+          this.setAttr(node, '__',        'isInited',            true)
+        }
 
         let customClasses = this.getAttr(node, '__', 'customClasses')
         if (typeof(this.fnCustomClasses) === 'function') {
           customClasses = this.fnCustomClasses(node)
+          if (!Array.isArray(customClasses)) {
+            customClasses = []
+          }
         }
         this.setAttr(node, '__', 'customClasses',  customClasses)
 
@@ -533,7 +537,7 @@ export default {
         if (isVisible) {
           dpos++
         }
-      }.bind(this))
+      }
 
       return items
     },
@@ -1236,10 +1240,11 @@ export default {
         beginTimestamp: Date.now(),
       })
 
+      this.dragEnter(node)
       this.$emit('dragstart', this.dragAndDrop, event)
     },
     calcDragAndDropStatus(clientX, clientY) {
-      if (this.$refs.tree === undefined || this.$refs.tree === null) {
+      if (!this.$refs.tree) {
         return
       }
 
@@ -1283,8 +1288,8 @@ export default {
     },
     globalDragOverEvent(event) {
       event.preventDefault()
-      this.dragAndDrop.clientX = event.clientX + 'px'
-      this.dragAndDrop.clientY = event.clientY + 'px'
+      this.dragAndDrop.clientX = Math.floor(event.clientX)
+      this.dragAndDrop.clientY = Math.floor(event.clientY)
 
       this.calcDragAndDropStatus(event.clientX, event.clientY)
     },
@@ -1297,29 +1302,35 @@ export default {
         return
       }
 
+      let needToCalcIsDroppable = false
       if (this.dragAndDrop.overNode !== node) {
+        needToCalcIsDroppable = true
         this.dragLeave(this.dragAndDrop.overNode)
         this.dragEnter(node)
       }
 
-      let nodeElement = this.getElement(node)
-      let nodeOffset  = this.getOffset(node)
-      let nodeHeight = nodeElement.clientHeight
-      let x = event.pageX - nodeOffset.left
-      let y = event.pageY - nodeOffset.top
-
-      this.setAttr(node, '__', 'mousex', x + 'px')
-      this.setAttr(node, '__', 'mousey', y + 'px')
-
+      const y = event.clientY - this.dragAndDrop.overRect.top
+      const nodeHeight = this.dragAndDrop.overRect.height
+      let overArea = ''
       if (y < nodeHeight * 0.33) {
-        this.dragAndDrop.overArea = 'prev'
+        overArea = 'prev'
       } else if (nodeHeight - y < nodeHeight * 0.33) {
-        this.dragAndDrop.overArea = 'next'
+        overArea = 'next'
       } else {
-        this.dragAndDrop.overArea = 'self'
+        overArea = 'self'
+      }
+      if (overArea && overArea !== this.dragAndDrop.overArea) {
+        this.dragAndDrop.overArea = overArea
+        needToCalcIsDroppable = true
       }
 
-      this.dragAndDrop.isDroppable = this.isDroppable()
+      if (needToCalcIsDroppable) {
+        this.dragAndDrop.isDroppable = this.isDroppable()
+        if (this.dragAndDrop.isDroppable) {
+          const el = this.getElement(node)
+          el.classList.add(`vue-tree-node-drag-over-${overArea}`)
+        }
+      }
       event.preventDefault()
 
       this.setAttr(node, '__', 'dragOverArea', this.dragAndDrop.overArea)
@@ -1333,15 +1344,29 @@ export default {
     },
     dragEnter(node) {
       this.dragAndDrop.overNode = node
+      const el = this.getElement(node)
+      const rect = el.getBoundingClientRect()
+      this.dragAndDrop.overRect = {
+        left: rect.left,
+        top: rect.top,
+        width: rect.width,
+        height: rect.height
+      }
       this.$emit('dragenter', this.dragAndDrop, node)
     },
     dragLeave(node) {
       if (node !== null) {
-        this.setAttr(node, '__', 'dragOverArea', null)
         this.dragAndDrop.overNode = null
+        const el = this.getElement(node)
+        el.classList.remove('vue-tree-node-drag-over-prev')
+        el.classList.remove('vue-tree-node-drag-over-next')
+        el.classList.remove('vue-tree-node-drag-over-self')
       }
       this.$emit('dragleave', this.dragAndDrop, node)
     },
+    // this event is not bound on the nodes like other drag events.
+    // sometimes the user may remove the dragged node in the drop event, which may cause the dragend
+    // event to not be fired if the dragend event is bound on the deleted node.
     dragEndEvent(event) {
       if (this.dragAndDrop.overNode !== null) {
         this.dragLeave(this.dragAndDrop.overNode)
@@ -1357,12 +1382,12 @@ export default {
 
       this.dragAndDrop.dragNode = null
       this.dragAndDrop.overArea = null
+      this.dragAndDrop.overRect = {left: null, top: null, width: null, height: null}
       this.dragAndDrop.clientX  = null
       this.dragAndDrop.clientY  = null
       this.dragAndDrop.status   = this.DND_STATUS.NONE
       this.dragAndDrop.isTouch  = false
       this.dragAndDrop.from     = null
-
       this.$emit('dragend', this.dragAndDrop, event)
     },
     moveOnDrop() {
@@ -1508,8 +1533,8 @@ export default {
       }
 
       let touch = event.touches.item(0)
-      this.dragAndDrop.clientX = touch.clientX + 'px'
-      this.dragAndDrop.clientY = touch.clientY + 'px'
+      this.dragAndDrop.clientX = touch.clientX
+      this.dragAndDrop.clientY = touch.clientY
       this.dragAndDrop.isTouch = true
 
       this.calcDragAndDropStatus(touch.clientX, touch.clientY)
@@ -1556,8 +1581,8 @@ export default {
           continue
         }
 
-        event.pageX = touch.pageX
-        event.pageY = touch.pageY
+        event.clientX = touch.clientX
+        event.clientY = touch.clientY
         this.dragOverEvent(cnode, event)
         break
       }
@@ -1770,6 +1795,7 @@ export default {
 
   mounted() {
     this.refresh()
+    console.log(this.items.length)
 
     //drag and drop
     document.body.addEventListener('dragover', this.globalDragOverEvent.bind(this), {capture: true})
@@ -1825,20 +1851,19 @@ export default {
   margin-bottom: var(--marginBottom);
   text-indent: var(--fullIndent);
   background-color: var(--bgColor);
+  transition: all var(--animationDuration);
  }
 .vue-tree-node-enter-to, .vue-tree-node-leave-from {
   height: var(--height);
   opacity: 1;
 }
-.vue-tree-node-enter-from, .vue-tree-node-leave-to {
-  height: 0;
+.vue-tree-node-enter-from {
+  height: 3px;
   opacity: 0;
 }
-.vue-tree-node-enter-active, .vue-tree-node-leave-active {
-  transition: height var(--animationDuration), opacity var(--animationDuration);
-}
-.vue-tree-node-move {
-  transition: transform (--animationDuration);
+.vue-tree-node-leave-to {
+  height: 0;
+  opacity: 0;
 }
 .vue-tree-node:hover {
   background-color: var(--hoverBgColor);
@@ -1936,43 +1961,6 @@ export default {
 .vue-tree-node:hover .vue-tree-extra-wrapper {
   display: inline-block;
 }
-.vue-tree-node .vue-tree-drag-arrow-wrapper {
-  height: 0;
-  width: 0;
-  border: 0;
-  text-indent: 0;
-  position: absolute;
-  left: calc(var(--fullIndent) + 1em);
-  display: none;
-  flex-direction: row;
-  flex-wrap: nowrap;
-  justify-content: flex-end;
-  align-items: center;
-  overflow: hidden;
-  z-index: 10;
-}
-.vue-tree-node .vue-tree-drag-arrow-wrapper .vue-tree-arrow {
-  width: 1.7em;
-  height: 2.6em;
-  stroke: #5cb85c;
-  fill: #5cb85c;
-  overflow: visible;
-}
-.vue-tree-node.vue-tree-node-drag-over-prev .vue-tree-drag-arrow-wrapper {
-  display: flex;
-  overflow: visible;
-  top: 0;
-}
-.vue-tree-node.vue-tree-node-drag-over-next .vue-tree-drag-arrow-wrapper {
-  display: flex;
-  overflow: visible;
-  bottom: 0;
-}
-.vue-tree-node.vue-tree-node-drag-over-self .vue-tree-drag-arrow-wrapper {
-  display: flex;
-  overflow: visible;
-  top: 50%;
-}
 .vue-tree-node.vue-tree-node-drag-over-self .vue-tree-icon-and-title {
   background-color: var(--dragOverBgColor);
 }
@@ -1983,15 +1971,7 @@ export default {
   top: calc(var(--mousey) + 0.5em);
   z-index: 10;
 }
-.vue-tree-node .vue-tree-drag-image-wrapper {
-  display: block;
-  position: fixed;
-  z-index: 11;
-  left: calc(var(--mousex) + var(--dragImageOffsetX));
-  top: calc(var(--mousey) + var(--dragImageOffsetY));
-  text-indent: 0;
-}
-.vue-tree-node .vue-tree-drag-image-wrapper .vue-tree-drag-image {
+.vue-tree-node .vue-tree-drag-image {
   text-indent: 0;
   font-size: var(--fontSize);
   width: auto;
@@ -2082,5 +2062,12 @@ export default {
   top: var(--mousey);
   z-index: 100;
   text-indent: 0;
+}
+.vue-tree-wrapper .vue-tree-drag-arrow {
+  width: 1.7em;
+  height: 2.6em;
+  stroke: #5cb85c;
+  fill: #5cb85c;
+  overflow: visible;
 }
 </style>

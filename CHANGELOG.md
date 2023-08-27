@@ -1,3 +1,7 @@
+3.1.0
+- changed:
+    - improve the performance of drag and drop operations.
+
 3.0.0
 - added:
 	- touch support for drag and drop.
@@ -11,7 +15,7 @@
   - the reload() method caused an animation playing.
 	- a node was able to be dragged while the user was editing its title.
 	- reverted the performance optimization that might lead to the fnAfterCalculate property not working in 2.0.0.
-	- when the dropped a node from another tree, two drop events were emitted.
+	- when the user dropped a node from another tree, two drop events were emitted.
 - security:
 	- upgraded some dependencies.
 

@@ -167,7 +167,13 @@ export default {
               sourceCodeUrl: 'https://github.com/TinyWisp/vue-tree/blob/master/example/views/DragAndDropMultipleTreesExample.vue',
               codepenUrl:    'https://codepen.io/tinywisp/pen/eYBggqp'
             },
-
+            {
+              title_en:      'multiple trees',
+              title_zh:      '多棵树',
+              route:         '/example/drag-and-drop/multiple-trees',
+              sourceCodeUrl: 'https://github.com/TinyWisp/vue-tree/blob/master/example/views/DragAndDropMultipleTreesExample.vue',
+              codepenUrl:    'https://codepen.io/tinywisp/pen/eYBggqp'
+            }
           ]
         },
 
@@ -306,6 +312,18 @@ export default {
           route:         '/example/sort',
           sourceCodeUrl: 'https://github.com/TinyWisp/vue-tree/blob/master/example/views/SortExample.vue',
           codepenUrl:    'https://codepen.io/tinywisp/pen/abBpJmW'
+        },
+        {
+          title_en:      'a lot of nodes',
+          title_zh:      '大量节点',
+          note_en:       'Actually this component is not good at handling a lot of nodes, but a few hundred ' +
+                         'nodes is ok. it is recommended to use `animationDuration="0"` to disable the animation if ' +
+                         'you want to make it more fluid.',
+          note_zh:       '该组件并不擅长大量节点，但在只有几百个节点时也能凑合使用。<br>' + 
+                         '当节点较多时，建议使用animationDuration="0"禁用动画效果。',
+          route:         '/example/a-lot-of-nodes',
+          sourceCodeUrl: 'https://github.com/TinyWisp/vue-tree/blob/master/example/views/ALotOfNodesExample.vue',
+          codepenUrl:    'https://codepen.io/tinywisp/pen/abPddry'
         },
 
         {

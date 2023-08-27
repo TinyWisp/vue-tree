@@ -11,6 +11,7 @@ import RadioButtonExample from '../views/RadioButtonExample.vue'
 import SortExample from '../views/SortExample.vue'
 import ReloadExample from '../views/ReloadExample.vue'
 import AutoReloadExample from '../views/AutoReloadExample.vue'
+import ALotOfNodesExample from '../views/ALotOfNodesExample.vue'
 
 import GettingStartedDisplayATreeExample from '../views/GettingStartedDisplayATreeExample.vue'
 import GettingStartedBasicOperationsExample from '../views/GettingStartedBasicOperationsExample.vue'
@@ -118,6 +119,11 @@ const routes = [
     path: '/:lang/example/auto-reload',
     name: 'auto-reload-example',
     component: AutoReloadExample
+  },
+  {
+    path: '/:lang/example/a-lot-of-nodes',
+    name: 'a-lot-of-nodes',
+    component: ALotOfNodesExample
   },
 
   {

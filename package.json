@@ -1,6 +1,6 @@
 {
   "name": "@tinywisp/vue-tree",
-  "version": "3.0.0",
+  "version": "3.1.0",
   "main": "lib/vue-tree.cjs.js",
   "module": "lib/vue-tree.esm.js",
   "unpkg": "lib/vue-tree.min.js",
@@ -19,8 +19,7 @@
     "url": "git+https://github.com/TinyWisp/vue-tree.git"
   },
   "scripts": {
-    "dev": "vite",
-    "serve": "vite preview --config vite.docs.config.js",
+    "dev": "vite --config vite.docs.config.js",
     "test:unit": "vitest --coverage --config vitest.config.js",
     "build:docs": "vite build --config vite.docs.config.js",
     "build:lib": "rollup --bundleConfigAsCjs --config build.lib.config.js"
@@ -38,7 +37,7 @@
     "@rollup/plugin-node-resolve": "^15.0.1",
     "@rollup/plugin-replace": "^5.0.2",
     "@rollup/plugin-terser": "^0.3.0",
-    "@vitejs/plugin-vue": "^4.0.0",
+    "@vitejs/plugin-vue": "^4.3.3",
     "@vitest/coverage-c8": "^0.27.2",
     "@vue/compiler-sfc": "^3.2.45",
     "@vue/test-utils": "^2.2.7",
