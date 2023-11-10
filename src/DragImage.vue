@@ -33,11 +33,12 @@ export default {
 <style scoped>
 .vue-tree-wrapper .vue-tree-drag-image-wrapper {
   display: block;
-  position: fixed;
+  position: absolute;
   z-index: 11;
-  left: calc(var(--mousex) + var(--dragImageOffsetX));
-  top: calc(var(--mousey) + var(--dragImageOffsetY));
+  left: calc(var(--mousex) + var(--dragImageOffsetX) - var(--treeClientX));
+  top: calc(var(--mousey) + var(--dragImageOffsetY) - var(--treeClientY));
   font-size: var(--dragNodeFontSize);
   text-indent: 0;
+  text-wrap: nowrap;
 }
 </style>

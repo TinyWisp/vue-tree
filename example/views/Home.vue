@@ -167,13 +167,6 @@ export default {
               sourceCodeUrl: 'https://github.com/TinyWisp/vue-tree/blob/master/example/views/DragAndDropMultipleTreesExample.vue',
               codepenUrl:    'https://codepen.io/tinywisp/pen/eYBggqp'
             },
-            {
-              title_en:      'multiple trees',
-              title_zh:      '多棵树',
-              route:         '/example/drag-and-drop/multiple-trees',
-              sourceCodeUrl: 'https://github.com/TinyWisp/vue-tree/blob/master/example/views/DragAndDropMultipleTreesExample.vue',
-              codepenUrl:    'https://codepen.io/tinywisp/pen/eYBggqp'
-            }
           ]
         },
 
@@ -575,10 +568,11 @@ export default {
   display: block;
 }
 .home.wide .main {
-  flex: calc(100% - 250px);
-  height: auto;
+  width: calc(100% - 250px);
+  height: 100vh;
   min-height: 100vh;
   flex-grow: 1;
+  overflow: auto;
 }
 
 .home.narrow {

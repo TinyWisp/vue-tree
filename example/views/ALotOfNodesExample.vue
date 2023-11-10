@@ -5,7 +5,7 @@
     <button class="btn" @click="edit()" >edit</button>
     <input type="text" v-model="keyword" placeholder="search" @input="search()">
     <div class="panel">
-      <vue-tree :tree="tree" ref="tree" @blur="blur" @select="select" class="tree" animationDuration="0" :autoReload="false" />
+      <vue-tree :tree="tree" ref="tree" @blur="blur" @select="select" class="tree" :autoReload="false" />
     </div>
   </div>
 </template>

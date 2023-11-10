@@ -8,7 +8,9 @@
       '--dragImageOffsetX': dragImageOffsetX,
       '--dragImageOffsetY': dragImageOffsetY,
       '--animationDuration': animationDuration,
-      '--treeWidth': treeWidth + 'px'
+      '--treeClientX': treeRect.clientX + 'px',
+      '--treeClientY': treeRect.clientY + 'px',
+      '--treeWidth': treeRect.width + 'px'
     }">
     <transition-group
       tag="ul" 
@@ -313,8 +315,13 @@ export default {
       nodes: JSON.parse(JSON.stringify(this.tree)),
       items: this.getItems(),
       autoIdCounter: 0,
-      treeWidth: 0,
-      treeWidthInterval: null,
+      treeRect: {
+        clientX: 0,
+        clientY: 0,
+        width: 0,
+        height: 0
+      },
+      treeRectInterval: null,
       spareDefaultAttrs: {
         selected: false,
         directoryState: 'expanded',
@@ -600,9 +607,9 @@ export default {
       this.refresh()
     },
     refresh() {
-      this.treeWidth = this.$refs.tree.offsetWidth
       this.items = this.getItems()
       this.refreshAllDirectoryCheckboxState()
+      this.calcTreeRect()
     },
     getNestedTree() {
       return this.nodes
@@ -761,6 +768,21 @@ export default {
       return {
         left: offsetLeft,
         top: offsetTop
+      }
+    },
+    calcTreeRect() {
+      const rect = this.$refs.tree.$el.getBoundingClientRect()
+      if (this.treeRect.clientX !== rect.x) {
+        this.treeRect.clientX = rect.x
+      }
+      if (this.treeRect.clientY !== rect.y) {
+        this.treeRect.clientY = rect.y
+      }
+      if (this.treeRect.width !== rect.width) {
+        this.treeRect.width = rect.width
+      }
+      if (this.treeRect.height !== rect.height) {
+        this.treeRect.height = rect.height
       }
     },
 
@@ -1280,6 +1302,7 @@ export default {
       } else if (isInTreeArea === false && this.dragAndDrop.dragNode === null) {
         this.dragAndDrop.status = this.DND_STATUS.NONE
         if (prevStatus === this.DND_STATUS.INTO) {
+          this.dragLeave(this.dragAndDrop.overNode)
           this.$emit('dragleavetree', this.dragAndDrop)
           this.dragAndDrop.from = null
         }
@@ -1785,8 +1808,11 @@ export default {
           this.expand(node)
         }
     },
+
+  //------------------------------------  others ---------------------------------------------
+
     resizeTree() {
-      this.treeWidth = this.$refs.tree.$el.offsetWidth
+      this.calcTreeRect()
     }
   },
 
@@ -1795,7 +1821,6 @@ export default {
 
   mounted() {
     this.refresh()
-    console.log(this.items.length)
 
     //drag and drop
     document.body.addEventListener('dragover', this.globalDragOverEvent.bind(this), {capture: true})
@@ -1807,16 +1832,12 @@ export default {
     document.body.addEventListener('touchmove', this.globalTouchMoveEvent.bind(this), {capture:true, passive: false})
     document.body.addEventListener('touchend', this.globalTouchEndEvent.bind(this), {capture:true, passive: false})
 
-    //calculate the tree's width
-    this.treeWidthInterval = setInterval(function(){
-      let treeWidth = this.$refs.tree.$el.offsetWidth
-      if (this.treeWidth !== treeWidth) {
-        this.treeWidth = treeWidth
-      }
-    }.bind(this), 300)
+    // calculate the tree's properties: width, height, clientX, clientY
+    this.calcTreeRect()
+    this.treeRectInterval = setInterval(this.calcTreeRect.bind(this), 300)
   },
   beforeUnmount() {
-    clearInterval(this.treeWidthInterval)
+    clearInterval(this.treeRectInterval)
     document.removeEventListener('dragover', this.globalDragOverEvent.bind(this), {capture: true})
     document.removeEventListener('touchend', this.globalTouchEndEvent.bind(this), {capture: true})
     document.removeEventListener('touchmove', this.globalTouchMoveEvent.bind(this), {capture: true})
@@ -1827,6 +1848,9 @@ export default {
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
+.vue-tree-wrapper {
+  position: relative;
+}
 .vue-tree-wrapper .vue-tree {
   position: relative;
   padding-inline-start: 0;

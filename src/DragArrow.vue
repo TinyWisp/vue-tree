@@ -34,9 +34,9 @@ export default {
   padding: 0;
   margin: 0;
   text-indent: 0;
-  position: fixed;
-  left: calc(var(--overNodeX) + var(--overNodeFullIndent) + 1em);
-  top: var(--overNodeY);
+  position: absolute;
+  left: calc(var(--overNodeX) + var(--overNodeFullIndent) + 1em - var(--treeClientX));
+  top: calc(var(--overNodeY) - var(--treeClientY));
   display: flex;
   flex-direction: column;
   flex-wrap: nowrap;

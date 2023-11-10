@@ -1,3 +1,8 @@
+3.2.0
+- fixed:
+	- if the user dragged a node, moved it from tree A to tree B, and then moved it out of tree B, there would be an arrow on tree B.
+	- if the parent container had a 'transform: translate3d' property, the arrow and ghost image would not work normally, and they would be displayed at the wrong position.
+
 3.1.0
 - changed:
     - improve the performance of drag and drop operations.
@@ -9,7 +14,7 @@
 	- the getDragFrom method.
 	- the fnCustomClasses property.
 - fixed:
-	- the previously selected node will be deselected if the user clicks a node and then the fnBeforeSelect 
+	- the previously selected node will be deselected if the user clicks a node and then the fnBeforeSelect
 	function returns false.
   - the input box's width didn't fit its content well.
   - the reload() method caused an animation playing.
