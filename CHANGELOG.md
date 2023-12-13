@@ -1,3 +1,7 @@
+3.2.1
+- fixed:
+	- the node.style.titleMaxWidth property doesn't work if it is negative and its unit is not '%'.
+
 3.2.0
 - fixed:
 	- if the user dragged a node, moved it from tree A to tree B, and then moved it out of tree B, there would be an arrow on tree B.

@@ -483,6 +483,8 @@ export default {
         if (titleMaxWidth[0] === '-') {
           if (titleMaxWidth[titleMaxWidth.length - 1] === '%') {
             titleMaxWidth = ' - ' + (-1 * parseFloat(titleMaxWidth) / 100.0) + ' * var(--treeWidth)'
+          } else {
+            titleMaxWidth = ' - ' + titleMaxWidth.substring(1)
           }
           titleMaxWidth = 'calc(var(--treeWidth) - 1em - var(--switcherMarginRight) - 2px - 1em - var(--iconMarginRight) ' + titleMaxWidth + ' - (' + fullIndentVal + '))'
         } else if(titleMaxWidth[titleMaxWidth.length - 1] === '%') {
