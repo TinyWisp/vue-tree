@@ -1,6 +1,6 @@
 {
   "name": "@tinywisp/vue-tree",
-  "version": "3.2.1",
+  "version": "3.2.2",
   "main": "lib/vue-tree.cjs.js",
   "module": "lib/vue-tree.esm.js",
   "unpkg": "lib/vue-tree.min.js",

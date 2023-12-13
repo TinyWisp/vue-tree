@@ -1,3 +1,7 @@
+3.2.2
+- fixed:
+	- a node, whose title is truncated, doesn't show the tooltip when the mouse is over.
+
 3.2.1
 - fixed:
 	- the node.style.titleMaxWidth property doesn't work if it is negative and its unit is not '%'.

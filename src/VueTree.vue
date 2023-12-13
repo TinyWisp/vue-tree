@@ -118,6 +118,7 @@
                   <span
                     class="vue-tree-title"
                     :title="item.__.titleTip"
+                    @mouseenter="mouseenterEvent(item)"
                   >{{item.title}}</span>
                 </slot>
                 </template>
